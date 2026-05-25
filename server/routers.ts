@@ -128,6 +128,29 @@ export const appRouter = router({
         await db.updateStorePassword(storeId, hashedPassword);
         return { success: true };
       }),
+
+    // 設定 LINE 訂單通知接收人
+    setLineOrderRecipient: publicProcedure
+      .input(z.object({
+        lineOrderRecipientUserId: z.string().min(1),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const storeId = await requireStore(ctx);
+        await db.updateStore(storeId, {
+          lineOrderRecipientUserId: input.lineOrderRecipientUserId,
+        } as Parameters<typeof db.updateStore>[1]);
+        return { success: true };
+      }),
+
+    // 取得 LINE 訂單通知接收人
+    getLineOrderRecipient: publicProcedure.query(async ({ ctx }) => {
+      const storeId = await requireStore(ctx);
+      const store = await db.getStoreById(storeId);
+      return {
+        lineOrderRecipientUserId: store?.lineOrderRecipientUserId || null,
+        storeId,
+      };
+    }),
   }),
 
   // ─── Admin Auth ────────────────────────────────────────────────────────────

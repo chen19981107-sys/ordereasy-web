@@ -111,6 +111,7 @@ export async function getStoreById(id: number) {
     passwordHash: stores.passwordHash,
     isActive: stores.isActive,
     subscriptionExpiresAt: stores.subscriptionExpiresAt,
+    lineOrderRecipientUserId: stores.lineOrderRecipientUserId,
     createdAt: stores.createdAt,
     updatedAt: stores.updatedAt,
   }).from(stores).where(eq(stores.id, id)).limit(1);

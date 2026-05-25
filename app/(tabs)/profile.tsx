@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View, TextInput, ScrollView, ActivityIndicator, Modal } from "react-native";
+import { Alert, Clipboard, Linking, StyleSheet, Text, TouchableOpacity, View, TextInput, ScrollView, ActivityIndicator, Modal } from "react-native";
 import { router } from "expo-router";
 import { useState } from "react";
 import { ScreenContainer } from "@/components/screen-container";
@@ -7,6 +7,8 @@ import { useColors } from "@/hooks/use-colors";
 import { useFontSize } from "@/lib/font-size-context";
 import { useAppAuth } from "@/lib/auth-context";
 import { trpc } from "@/lib/trpc";
+
+const LIFF_ID = "2010099034-bRRDAVqf";
 
 function formatDate(d: Date | string | null | undefined): string {
   if (!d) return "未設定";
@@ -29,14 +31,24 @@ export default function ProfileScreen() {
   const { fontSizeMultiplier } = useFontSize();
   const { storeInfo, logout } = useAppAuth();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showLineModal, setShowLineModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [lineUserId, setLineUserId] = useState("");
+  const [isSavingLine, setIsSavingLine] = useState(false);
 
   const updatePasswordMutation = trpc.store.updatePassword.useMutation();
+  const setLineRecipientMutation = trpc.store.setLineOrderRecipient.useMutation();
+  const lineRecipientQuery = trpc.store.getLineOrderRecipient.useQuery();
 
   const subStatus = getSubscriptionStatus(storeInfo?.subscriptionExpiresAt);
+
+  // LIFF 訂單連結
+  const liffOrderUrl = storeInfo?.storeId
+    ? `https://liff.line.me/${LIFF_ID}?storeId=${storeInfo.storeId}`
+    : null;
 
   const handleLogout = () => {
     Alert.alert("確認登出", "確定要登出嗎？", [
@@ -53,45 +65,46 @@ export default function ProfileScreen() {
   };
 
   const handleUpdatePassword = async () => {
-    if (!currentPassword.trim()) {
-      Alert.alert("提示", "請輸入目前密碼");
-      return;
-    }
-    if (!newPassword.trim() || newPassword.length < 6) {
-      Alert.alert("提示", "新密碼至少需要 6 個字元");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      Alert.alert("提示", "新密碼與確認密碼不一致");
-      return;
-    }
-    if (currentPassword === newPassword) {
-      Alert.alert("提示", "新密碼不能與目前密碼相同");
-      return;
-    }
+    if (!currentPassword.trim()) { Alert.alert("提示", "請輸入目前密碼"); return; }
+    if (!newPassword.trim() || newPassword.length < 6) { Alert.alert("提示", "新密碼至少需要 6 個字元"); return; }
+    if (newPassword !== confirmPassword) { Alert.alert("提示", "新密碼與確認密碼不一致"); return; }
+    if (currentPassword === newPassword) { Alert.alert("提示", "新密碼不能與目前密碼相同"); return; }
 
     setIsUpdatingPassword(true);
     try {
-      await updatePasswordMutation.mutateAsync({
-        currentPassword,
-        newPassword,
-      });
-      Alert.alert("成功", "密碼已更新", [
-        {
-          text: "確定",
-          onPress: () => {
-            setCurrentPassword("");
-            setNewPassword("");
-            setConfirmPassword("");
-            setShowPasswordModal(false);
-          },
+      await updatePasswordMutation.mutateAsync({ currentPassword, newPassword });
+      Alert.alert("成功", "密碼已更新", [{
+        text: "確定", onPress: () => {
+          setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+          setShowPasswordModal(false);
         },
-      ]);
+      }]);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "更新失敗，請稍後再試";
-      Alert.alert("錯誤", message);
+      Alert.alert("錯誤", err instanceof Error ? err.message : "更新失敗，請稍後再試");
     } finally {
       setIsUpdatingPassword(false);
+    }
+  };
+
+  const handleSaveLineRecipient = async () => {
+    if (!lineUserId.trim()) { Alert.alert("提示", "請輸入 LINE User ID"); return; }
+    if (!lineUserId.startsWith("U")) { Alert.alert("提示", "LINE User ID 格式錯誤，應以 U 開頭"); return; }
+    setIsSavingLine(true);
+    try {
+      await setLineRecipientMutation.mutateAsync({ lineOrderRecipientUserId: lineUserId.trim() });
+      await lineRecipientQuery.refetch();
+      Alert.alert("成功", "LINE 通知接收人已設定", [{ text: "確定", onPress: () => setShowLineModal(false) }]);
+    } catch (err: unknown) {
+      Alert.alert("錯誤", err instanceof Error ? err.message : "設定失敗");
+    } finally {
+      setIsSavingLine(false);
+    }
+  };
+
+  const handleCopyUrl = () => {
+    if (liffOrderUrl) {
+      Clipboard.setString(liffOrderUrl);
+      Alert.alert("已複製", "LIFF 訂單連結已複製到剪貼簿");
     }
   };
 
@@ -104,9 +117,18 @@ export default function ProfileScreen() {
     },
     storeName: { fontSize: 26 * fontSizeMultiplier, fontWeight: "800", color: colors.foreground },
     username: { fontSize: 14 * fontSizeMultiplier, color: colors.muted, marginTop: 4 },
+    sectionLabel: {
+      fontSize: 12 * fontSizeMultiplier,
+      fontWeight: "700",
+      color: colors.muted,
+      marginHorizontal: 20,
+      marginTop: 24,
+      marginBottom: 8,
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+    },
     section: {
       marginHorizontal: 16,
-      marginTop: 24,
       backgroundColor: colors.surface,
       borderRadius: 16,
       borderWidth: 1,
@@ -128,13 +150,34 @@ export default function ProfileScreen() {
       paddingVertical: 16,
     },
     rowLabel: { flex: 1, fontSize: 15 * fontSizeMultiplier, color: colors.foreground, fontWeight: "500" },
-    rowValue: { fontSize: 15 * fontSizeMultiplier, color: colors.muted },
-    statusBadge: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: 20,
-    },
+    rowValue: { fontSize: 14 * fontSizeMultiplier, color: colors.muted },
+    statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
     statusText: { fontSize: 13 * fontSizeMultiplier, fontWeight: "700" },
+    liffUrlBox: {
+      backgroundColor: colors.background,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      marginHorizontal: 16,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    liffUrlText: {
+      fontSize: 12 * fontSizeMultiplier,
+      color: colors.muted,
+      fontFamily: "monospace",
+    },
+    copyBtn: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      alignItems: "center",
+      marginHorizontal: 16,
+      marginBottom: 16,
+    },
+    copyBtnText: { color: "#fff", fontSize: 14 * fontSizeMultiplier, fontWeight: "700" },
     logoutButton: {
       margin: 24,
       backgroundColor: colors.error,
@@ -146,23 +189,9 @@ export default function ProfileScreen() {
       gap: 8,
     },
     logoutText: { color: "#fff", fontSize: 17 * fontSizeMultiplier, fontWeight: "700" },
-    securityRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: 16,
-      paddingVertical: 16,
-      borderBottomWidth: 0.5,
-      borderBottomColor: colors.border,
-    },
-    securityRowLast: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: 16,
-      paddingVertical: 16,
-    },
     modalOverlay: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      backgroundColor: "rgba(0,0,0,0.5)",
       justifyContent: "flex-end",
     },
     modalContent: {
@@ -173,12 +202,8 @@ export default function ProfileScreen() {
       paddingTop: 20,
       paddingBottom: 30,
     },
-    modalTitle: {
-      fontSize: 18 * fontSizeMultiplier,
-      fontWeight: "800",
-      color: colors.foreground,
-      marginBottom: 20,
-    },
+    modalTitle: { fontSize: 18 * fontSizeMultiplier, fontWeight: "800", color: colors.foreground, marginBottom: 8 },
+    modalSubtitle: { fontSize: 13 * fontSizeMultiplier, color: colors.muted, marginBottom: 20, lineHeight: 20 },
     modalInput: {
       backgroundColor: colors.surface,
       borderRadius: 12,
@@ -195,13 +220,9 @@ export default function ProfileScreen() {
       borderRadius: 12,
       paddingVertical: 14,
       alignItems: "center",
-      marginTop: 20,
+      marginTop: 8,
     },
-    modalButtonText: {
-      color: "#fff",
-      fontSize: 16 * fontSizeMultiplier,
-      fontWeight: "700",
-    },
+    modalButtonText: { color: "#fff", fontSize: 16 * fontSizeMultiplier, fontWeight: "700" },
     cancelButton: {
       backgroundColor: colors.surface,
       borderRadius: 12,
@@ -211,12 +232,10 @@ export default function ProfileScreen() {
       borderWidth: 1,
       borderColor: colors.border,
     },
-    cancelButtonText: {
-      color: colors.foreground,
-      fontSize: 16,
-      fontWeight: "700",
-    },
+    cancelButtonText: { color: colors.foreground, fontSize: 16, fontWeight: "700" },
   });
+
+  const currentRecipient = lineRecipientQuery.data?.lineOrderRecipientUserId;
 
   return (
     <ScreenContainer containerClassName="bg-background" className="">
@@ -227,6 +246,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Subscription Info */}
+        <Text style={styles.sectionLabel}>訂閱資訊</Text>
         <View style={styles.section}>
           <View style={styles.row}>
             <Text style={styles.rowLabel}>訂閱到期日</Text>
@@ -240,14 +260,45 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Account Security */}
+        {/* LIFF Order Link */}
+        <Text style={styles.sectionLabel}>LINE 線上訂餐連結</Text>
         <View style={styles.section}>
-          <TouchableOpacity style={styles.securityRow} onPress={() => setShowPasswordModal(true)}>
+          <TouchableOpacity style={styles.row} onPress={() => setShowLineModal(true)}>
+            <Text style={styles.rowLabel}>LINE 通知接收人</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              {currentRecipient ? (
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.success }} />
+              ) : (
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.warning }} />
+              )}
+              <Text style={styles.rowValue}>{currentRecipient ? "已設定" : "未設定"}</Text>
+              <IconSymbol name="chevron.right" size={18} color={colors.muted} />
+            </View>
+          </TouchableOpacity>
+          {liffOrderUrl && (
+            <View style={styles.rowLast}>
+              <Text style={[styles.rowLabel, { fontSize: 14 * fontSizeMultiplier }]}>訂單表單連結</Text>
+              <TouchableOpacity onPress={handleCopyUrl} style={{ backgroundColor: colors.primary + "22", borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+                <Text style={{ color: colors.primary, fontSize: 13 * fontSizeMultiplier, fontWeight: "700" }}>複製連結</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+        {liffOrderUrl && (
+          <View style={styles.liffUrlBox}>
+            <Text style={styles.liffUrlText} numberOfLines={2}>{liffOrderUrl}</Text>
+          </View>
+        )}
+
+        {/* Account Security */}
+        <Text style={styles.sectionLabel}>帳號安全</Text>
+        <View style={styles.section}>
+          <TouchableOpacity style={styles.row} onPress={() => setShowPasswordModal(true)}>
             <Text style={styles.rowLabel}>修改密碼</Text>
             <IconSymbol name="chevron.right" size={20} color={colors.muted} />
           </TouchableOpacity>
-          <View style={styles.securityRowLast}>
-            <Text style={styles.rowLabel}>帳號安全</Text>
+          <View style={styles.rowLast}>
+            <Text style={styles.rowLabel}>帳號狀態</Text>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.success }} />
               <Text style={styles.rowValue}>正常</Text>
@@ -263,67 +314,58 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* Password Change Modal */}
-      <Modal
-        visible={showPasswordModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => {
-          setCurrentPassword("");
-          setNewPassword("");
-          setConfirmPassword("");
-          setShowPasswordModal(false);
-        }}
-      >
+      <Modal visible={showPasswordModal} transparent animationType="slide"
+        onRequestClose={() => { setCurrentPassword(""); setNewPassword(""); setConfirmPassword(""); setShowPasswordModal(false); }}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>修改密碼</Text>
+            <TextInput style={styles.modalInput} value={currentPassword} onChangeText={setCurrentPassword}
+              placeholder="目前密碼" placeholderTextColor={colors.muted} secureTextEntry returnKeyType="next" />
+            <TextInput style={styles.modalInput} value={newPassword} onChangeText={setNewPassword}
+              placeholder="新密碼（至少 6 個字元）" placeholderTextColor={colors.muted} secureTextEntry returnKeyType="next" />
+            <TextInput style={styles.modalInput} value={confirmPassword} onChangeText={setConfirmPassword}
+              placeholder="確認新密碼" placeholderTextColor={colors.muted} secureTextEntry returnKeyType="done" />
+            <TouchableOpacity style={styles.modalButton} onPress={handleUpdatePassword} disabled={isUpdatingPassword}>
+              {isUpdatingPassword ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalButtonText}>確認修改</Text>}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => { setCurrentPassword(""); setNewPassword(""); setConfirmPassword(""); setShowPasswordModal(false); }}>
+              <Text style={styles.cancelButtonText}>取消</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* LINE Recipient Modal */}
+      <Modal visible={showLineModal} transparent animationType="slide"
+        onRequestClose={() => setShowLineModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>設定 LINE 通知接收人</Text>
+            <Text style={styles.modalSubtitle}>
+              輸入要接收新訂單通知的 LINE User ID。{"\n"}
+              取得方式：至 LINE Developers Console → 選擇 Channel → Basic settings → Your user ID（格式：Uxxxxxxxxxx）
+            </Text>
+            {currentRecipient && (
+              <View style={{ backgroundColor: colors.success + "22", borderRadius: 8, padding: 10, marginBottom: 12 }}>
+                <Text style={{ fontSize: 12 * fontSizeMultiplier, color: colors.success, fontWeight: "600" }}>
+                  目前設定：{currentRecipient}
+                </Text>
+              </View>
+            )}
             <TextInput
               style={styles.modalInput}
-              value={currentPassword}
-              onChangeText={setCurrentPassword}
-              placeholder="目前密碼"
+              value={lineUserId}
+              onChangeText={setLineUserId}
+              placeholder={currentRecipient || "U748923442f29b67ceefc88f4f1d86657"}
               placeholderTextColor={colors.muted}
-              secureTextEntry
-              returnKeyType="next"
-            />
-            <TextInput
-              style={styles.modalInput}
-              value={newPassword}
-              onChangeText={setNewPassword}
-              placeholder="新密碼（至少 6 個字元）"
-              placeholderTextColor={colors.muted}
-              secureTextEntry
-              returnKeyType="next"
-            />
-            <TextInput
-              style={styles.modalInput}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              placeholder="確認新密碼"
-              placeholderTextColor={colors.muted}
-              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
               returnKeyType="done"
             />
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleUpdatePassword}
-              disabled={isUpdatingPassword}
-            >
-              {isUpdatingPassword ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.modalButtonText}>確認修改</Text>
-              )}
+            <TouchableOpacity style={styles.modalButton} onPress={handleSaveLineRecipient} disabled={isSavingLine}>
+              {isSavingLine ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalButtonText}>儲存設定</Text>}
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setCurrentPassword("");
-                setNewPassword("");
-                setConfirmPassword("");
-                setShowPasswordModal(false);
-              }}
-            >
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setShowLineModal(false)}>
               <Text style={styles.cancelButtonText}>取消</Text>
             </TouchableOpacity>
           </View>
