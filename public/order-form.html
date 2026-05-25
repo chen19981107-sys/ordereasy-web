@@ -1,646 +1,663 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>線上訂餐 - ㄚ嬤灶咖</title>
-
-  <!-- LIFF SDK -->
-  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ㄚ嬤灶咖｜線上點餐系統</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --primary: #E85D04;
-      --primary-light: #fff3ec;
-      --primary-dark: #c44d00;
-      --text: #1a1a1a;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --surface: #f9fafb;
-      --white: #ffffff;
-      --success: #22c55e;
-      --error: #ef4444;
-      --radius: 12px;
+      --primary: #c0392b;
+      --primary-dark: #96281b;
+      --primary-light: #f9e8e6;
+      --accent: #e67e22;
+      --accent-light: #fef5ec;
+      --bg: #faf8f5;
+      --surface: #ffffff;
+      --border: #e8e0d8;
+      --text: #2c2c2c;
+      --text-muted: #7a7068;
+      --success: #27ae60;
+      --success-light: #eafaf1;
+      --radius: 14px;
+      --shadow: 0 2px 16px rgba(0,0,0,0.08);
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f3f4f6;
-      min-height: 100vh;
+      font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
       color: var(--text);
-    }
-
-    /* ── Loading / Error screens ── */
-    #loadingScreen, #errorScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      gap: 16px;
-      padding: 24px;
-      text-align: center;
+      padding: 0 0 60px;
     }
-    #errorScreen { display: none; }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 4px solid var(--border);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Main layout ── */
-    #mainContent { display: none; padding-bottom: 32px; }
-
+    /* ── Header ── */
     .header {
-      background: linear-gradient(135deg, var(--primary) 0%, #f7931e 100%);
+      background: linear-gradient(135deg, #8b1a0e 0%, #c0392b 50%, #e74c3c 100%);
       color: white;
-      padding: 28px 20px 24px;
       text-align: center;
-    }
-    .header h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
-    .header p { font-size: 13px; opacity: 0.9; }
-
-    .store-name-badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.25);
-      border-radius: 20px;
-      padding: 4px 14px;
-      font-size: 13px;
-      margin-top: 8px;
-      font-weight: 600;
-    }
-
-    .section {
-      background: var(--white);
-      margin: 12px 16px 0;
-      border-radius: var(--radius);
+      padding: 48px 24px 40px;
+      position: relative;
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
+    .header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .header-emoji { font-size: 52px; margin-bottom: 12px; display: block; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+    .header h1 { font-size: 28px; font-weight: 900; letter-spacing: 1px; margin-bottom: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .header p { font-size: 15px; opacity: 0.9; line-height: 1.6; max-width: 320px; margin: 0 auto; }
 
-    .section-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid var(--border);
-    }
+    /* ── Container ── */
+    .container { max-width: 600px; margin: 0 auto; padding: 0 16px; }
 
-    /* ── Form fields ── */
-    .field { padding: 14px 16px; border-bottom: 1px solid var(--border); }
-    .field:last-child { border-bottom: none; }
-    .field label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .field input, .field textarea, .field select {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-size: 16px;
-      font-family: inherit;
-      color: var(--text);
+    /* ── Section Card ── */
+    .card {
       background: var(--surface);
-      transition: border-color 0.15s;
-      -webkit-appearance: none;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-top: 20px;
+      overflow: hidden;
     }
-    .field input:focus, .field textarea:focus, .field select:focus {
-      outline: none;
-      border-color: var(--primary);
-      background: var(--white);
+    .card-header {
+      background: linear-gradient(90deg, var(--primary-light), #fff);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .field textarea { resize: none; min-height: 80px; }
-    .field .hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+    .card-header-icon { font-size: 22px; }
+    .card-header-title { font-size: 17px; font-weight: 800; color: var(--primary-dark); }
+    .card-header-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .card-body { padding: 20px; }
 
-    /* ── Menu items ── */
+    /* ── Menu Items ── */
     .menu-item {
       display: flex;
       align-items: center;
-      padding: 14px 16px;
+      padding: 14px 0;
       border-bottom: 1px solid var(--border);
       gap: 12px;
-      transition: background 0.1s;
     }
     .menu-item:last-child { border-bottom: none; }
-    .menu-item.selected { background: var(--primary-light); }
-
-    .menu-check {
-      width: 22px; height: 22px;
-      border: 2px solid var(--border);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .menu-item.selected .menu-check {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
-    .menu-check svg { display: none; }
-    .menu-item.selected .menu-check svg { display: block; }
-
-    .menu-info { flex: 1; min-width: 0; }
-    .menu-name { font-size: 16px; font-weight: 600; color: var(--text); }
-    .menu-price { font-size: 14px; color: var(--primary); font-weight: 700; margin-top: 2px; }
-
+    .menu-item-info { flex: 1; }
+    .menu-item-name { font-size: 16px; font-weight: 700; color: var(--text); }
+    .menu-item-price { font-size: 14px; color: var(--accent); font-weight: 700; margin-top: 3px; }
     .qty-control {
-      display: flex; align-items: center; gap: 8px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.15s;
-    }
-    .menu-item.selected .qty-control { opacity: 1; pointer-events: auto; }
-
-    .qty-btn {
-      width: 32px; height: 32px;
-      border: 1.5px solid var(--border);
-      background: var(--white);
-      border-radius: 8px;
-      font-size: 18px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      color: var(--text);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .qty-btn:active { background: var(--surface); }
-    .qty-num { font-size: 16px; font-weight: 700; min-width: 20px; text-align: center; }
-
-    /* ── Order summary ── */
-    .summary {
-      background: var(--primary-light);
-      margin: 12px 16px 0;
-      border-radius: var(--radius);
-      padding: 16px;
-      border: 1.5px solid rgba(232,93,4,0.15);
-    }
-    .summary-row {
-      display: flex; justify-content: space-between;
-      font-size: 14px; color: var(--text);
-      margin-bottom: 6px;
-    }
-    .summary-row:last-child { margin-bottom: 0; }
-    .summary-total {
-      border-top: 1px solid rgba(232,93,4,0.2);
-      padding-top: 10px; margin-top: 6px;
-      font-size: 18px; font-weight: 800;
-      color: var(--primary);
-    }
-
-    /* ── Alert messages ── */
-    .alert {
-      margin: 12px 16px 0;
-      padding: 13px 16px;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 500;
-      display: none;
-    }
-    .alert-error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-    .alert-success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
-
-    /* ── Submit button ── */
-    .submit-wrap { padding: 20px 16px 8px; }
-    .submit-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--primary) 0%, #f7931e 100%);
-      color: white;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .submit-btn:active { transform: scale(0.98); }
-    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-
-    /* ── Success screen ── */
-    #successScreen {
-      display: none;
-      flex-direction: column;
+      display: flex;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 32px 24px;
-      text-align: center;
-      background: var(--white);
+      gap: 0;
+      background: var(--bg);
+      border-radius: 40px;
+      border: 1.5px solid var(--border);
+      overflow: hidden;
     }
-    .success-icon {
-      width: 80px; height: 80px;
-      background: #f0fdf4;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 20px;
-    }
-    .success-icon svg { width: 40px; height: 40px; color: var(--success); }
-    #successScreen h2 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-    #successScreen p { font-size: 15px; color: var(--muted); line-height: 1.6; }
-    .order-summary-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-top: 20px;
-      width: 100%;
-      max-width: 360px;
-      text-align: left;
-    }
-    .order-summary-card h3 { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 10px; }
-    .order-summary-card .row {
-      display: flex; justify-content: space-between;
-      font-size: 14px; margin-bottom: 6px;
-    }
-    .close-btn {
-      margin-top: 24px;
-      padding: 14px 40px;
-      background: var(--primary);
-      color: white;
+    .qty-btn {
+      width: 36px;
+      height: 36px;
       border: none;
-      border-radius: var(--radius);
-      font-size: 16px;
+      background: transparent;
+      font-size: 20px;
       font-weight: 700;
       cursor: pointer;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
-
-    .empty-menu {
-      padding: 32px 16px;
+    .qty-btn:active { background: var(--primary-light); }
+    .qty-btn:disabled { color: #ccc; cursor: default; }
+    .qty-display {
+      width: 36px;
       text-align: center;
-      color: var(--muted);
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      user-select: none;
     }
 
-    /* ── Store selector (if storeId not in URL) ── */
-    #storeSelector { display: none; }
+    /* ── Order Summary ── */
+    .order-summary {
+      background: var(--accent-light);
+      border: 1.5px solid #f0c080;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 16px;
+      display: none;
+    }
+    .order-summary.visible { display: block; }
+    .order-summary-title { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    .order-summary-item { font-size: 14px; color: var(--text); line-height: 1.8; }
+    .order-summary-total {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f0c080;
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── Form Fields ── */
+    .field { margin-bottom: 20px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .required-badge {
+      background: var(--primary);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .optional-badge {
+      background: #e0e0e0;
+      color: #888;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .field input[type="text"],
+    .field input[type="datetime-local"],
+    .field textarea {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+      background: white;
+    }
+    .field input.error,
+    .field textarea.error {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .field textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    .field-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .field-error { font-size: 12px; color: var(--primary); margin-top: 6px; display: none; font-weight: 600; }
+    .field-error.visible { display: block; }
+
+    /* ── Submit Button ── */
+    .submit-section { margin-top: 24px; }
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 900;
+      font-family: inherit;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 20px rgba(192,57,43,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .submit-btn:active { transform: scale(0.98); box-shadow: 0 2px 10px rgba(192,57,43,0.25); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .submit-note { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+
+    /* ── Success Screen ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+    }
+    .success-screen.visible { display: block; }
+    .success-icon { font-size: 72px; margin-bottom: 20px; }
+    .success-title { font-size: 26px; font-weight: 900; color: var(--success); margin-bottom: 12px; }
+    .success-subtitle { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; }
+    .success-detail {
+      background: var(--success-light);
+      border: 1.5px solid #a9dfbf;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .success-detail-row { font-size: 14px; color: var(--text); line-height: 2; }
+    .success-detail-label { font-weight: 700; color: var(--success); }
+    .new-order-btn {
+      background: var(--surface);
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* ── Loading Overlay ── */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .loading-overlay.visible { display: flex; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .loading-text { color: white; font-size: 16px; font-weight: 700; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .header h1 { font-size: 22px; }
+      .header p { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Loading -->
-<div id="loadingScreen">
+<!-- Header -->
+<div class="header">
+  <span class="header-emoji">🍱</span>
+  <h1>ㄚ嬤灶咖｜線上點餐系統</h1>
+  <p>每一道餐點，都是ㄚ嬤灶咖用心準備的熟悉滋味。</p>
+</div>
+
+<div class="container">
+
+  <!-- Form -->
+  <form id="orderForm" novalidate>
+
+    <!-- 餐點選擇 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">🍽️</span>
+        <div>
+          <div class="card-header-title">餐點選擇 <span class="required-badge">必填</span></div>
+          <div class="card-header-subtitle">請至少選擇一項餐點</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="menuList">
+          <!-- 動態生成 -->
+        </div>
+
+        <!-- 訂單摘要 -->
+        <div class="order-summary" id="orderSummary">
+          <div class="order-summary-title">📋 已選餐點</div>
+          <div id="summaryItems" class="order-summary-item"></div>
+          <div class="order-summary-total">
+            <span>合計</span>
+            <span id="summaryTotal">$0</span>
+          </div>
+        </div>
+        <div class="field-error" id="menuError">⚠️ 請至少選擇一項餐點</div>
+      </div>
+    </div>
+
+    <!-- 取餐時間 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">🕐</span>
+        <div>
+          <div class="card-header-title">取餐時間 <span class="required-badge">必填</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <input type="datetime-local" id="pickupTime" name="pickupTime" required />
+          <div class="field-error" id="pickupTimeError">⚠️ 請選擇取餐時間</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 顧客資訊 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">👤</span>
+        <div>
+          <div class="card-header-title">顧客資訊</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <div class="field-label">您的姓氏 <span class="required-badge">必填</span></div>
+          <input type="text" id="customerName" name="customerName"
+            placeholder="例：王先生、小美小姐" required maxlength="20" />
+          <div class="field-error" id="customerNameError">⚠️ 請填寫您的姓氏</div>
+        </div>
+        <div class="field">
+          <div class="field-label">手機末三碼 <span class="required-badge">必填</span></div>
+          <input type="text" id="phoneLastThree" name="phoneLastThree"
+            placeholder="000" required maxlength="3" inputmode="numeric"
+            pattern="\d{3}" />
+          <div class="field-hint">用於取餐時核對身份</div>
+          <div class="field-error" id="phoneError">⚠️ 請填寫手機末三碼（3位數字）</div>
+        </div>
+        <div class="field">
+          <div class="field-label">備註 <span class="optional-badge">選填</span></div>
+          <textarea id="note" name="note"
+            placeholder="例：不要蔥、醬汁多一點" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-section">
+      <button type="submit" class="submit-btn" id="submitBtn">
+        🛒 確認送出訂單
+      </button>
+      <p class="submit-note">送出後將無法修改，請確認餐點內容後再送出</p>
+    </div>
+
+  </form>
+
+  <!-- Success Screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">訂單已成功送出！</div>
+    <div class="success-subtitle">
+      感謝您的訂購，我們會盡快為您準備餐點。<br/>
+      請於指定時間前來取餐。
+    </div>
+    <div class="success-detail" id="successDetail"></div>
+    <button class="new-order-btn" onclick="resetForm()">再次訂購</button>
+  </div>
+
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
-  <p style="color:#6b7280;font-size:14px;">載入中...</p>
-</div>
-
-<!-- Error -->
-<div id="errorScreen">
-  <div style="font-size:48px;">⚠️</div>
-  <h2 style="font-size:20px;font-weight:700;">載入失敗</h2>
-  <p id="errorMsg" style="color:#6b7280;font-size:14px;margin-top:8px;"></p>
-  <button onclick="location.reload()" style="margin-top:20px;padding:12px 28px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">重新載入</button>
-</div>
-
-<!-- Main Form -->
-<div id="mainContent">
-  <div class="header">
-    <h1>🍜 線上訂餐</h1>
-    <p>請填寫以下資訊完成訂單</p>
-    <div class="store-name-badge" id="storeNameBadge">ㄚ嬤灶咖</div>
-  </div>
-
-  <div id="alertError" class="alert alert-error"></div>
-
-  <!-- 顧客資訊 -->
-  <div class="section">
-    <div class="section-title">顧客資訊</div>
-    <div class="field">
-      <label>姓名 <span style="color:var(--primary)">*</span></label>
-      <input type="text" id="custName" placeholder="請輸入您的姓名" autocomplete="name">
-    </div>
-    <div class="field">
-      <label>電話末三碼 <span style="color:var(--primary)">*</span></label>
-      <input type="tel" id="custPhone" placeholder="例：567" maxlength="3" inputmode="numeric" pattern="[0-9]{3}">
-      <p class="hint">僅需輸入手機末三碼，方便取餐核對</p>
-    </div>
-    <div class="field">
-      <label>取餐時間 <span style="color:var(--primary)">*</span></label>
-      <input type="datetime-local" id="pickupTime">
-    </div>
-  </div>
-
-  <!-- 菜單選擇 -->
-  <div class="section">
-    <div class="section-title">菜單選擇</div>
-    <div id="menuList">
-      <div class="empty-menu">載入菜單中...</div>
-    </div>
-  </div>
-
-  <!-- 訂單摘要 -->
-  <div class="summary" id="orderSummary" style="display:none;">
-    <div id="summaryItems"></div>
-    <div class="summary-row summary-total">
-      <span>總金額</span>
-      <span id="summaryTotal">$0</span>
-    </div>
-  </div>
-
-  <!-- 備註 -->
-  <div class="section">
-    <div class="section-title">備註</div>
-    <div class="field">
-      <textarea id="custNote" placeholder="例：不要冰、加辣、少糖等特殊需求"></textarea>
-    </div>
-  </div>
-
-  <!-- 提交 -->
-  <div class="submit-wrap">
-    <button class="submit-btn" id="submitBtn" onclick="submitOrder()">確認下單</button>
-  </div>
-</div>
-
-<!-- Success Screen -->
-<div id="successScreen">
-  <div class="success-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
-  </div>
-  <h2>訂單已送出！</h2>
-  <p>感謝您的訂購<br>店家已收到通知，請準時取餐</p>
-  <div class="order-summary-card" id="successSummary"></div>
-  <button class="close-btn" onclick="closeLiff()">關閉</button>
+  <div class="loading-text">訂單送出中…</div>
 </div>
 
 <script>
-  // ── Config ──────────────────────────────────────────────────────────────────
-  const LIFF_ID = "2010099034-bRRDAVqf";
+// ── 菜單資料 ──────────────────────────────────────────────────────────────────
+const MENU = [
+  { id: 1,  name: "泰式拌飯",   price: 140 },
+  { id: 2,  name: "咖哩雞飯",   price: 140 },
+  { id: 3,  name: "燒肉丼飯",   price: 100 },
+  { id: 4,  name: "親子丼飯",   price: 100 },
+  { id: 5,  name: "牛肉丼飯",   price: 110 },
+  { id: 6,  name: "鯛魚丼飯",   price: 110 },
+  { id: 7,  name: "虱目魚丼飯", price: 110 },
+  { id: 8,  name: "豬多多",     price: 140 },
+  { id: 9,  name: "牛多多",     price: 160 },
+];
 
-  // ── State ───────────────────────────────────────────────────────────────────
-  let storeId = null;
-  let menuItems = [];
-  let selections = {}; // { itemId: qty }
-  let lineUserId = null;
-  let lineDisplayName = null;
+// 取得 storeId（從 URL 參數）
+const urlParams = new URLSearchParams(window.location.search);
+const STORE_ID = urlParams.get("storeId") || "1";
+const API_BASE = window.location.origin;
 
-  // ── Helpers ─────────────────────────────────────────────────────────────────
-  function show(id) { document.getElementById(id).style.display = 'flex'; }
-  function hide(id) { document.getElementById(id).style.display = 'none'; }
-  function showBlock(id) { document.getElementById(id).style.display = 'block'; }
+// ── 數量狀態 ──────────────────────────────────────────────────────────────────
+const quantities = {};
+MENU.forEach(item => { quantities[item.id] = 0; });
 
-  function showError(msg) {
-    const el = document.getElementById('alertError');
-    el.textContent = msg;
-    el.style.display = 'block';
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  function clearError() { document.getElementById('alertError').style.display = 'none'; }
-
-  function getApiBase() {
-    const { protocol, hostname } = window.location;
-    const apiHostname = hostname.replace(/^8081-/, '3000-');
-    if (apiHostname !== hostname) return `${protocol}//${apiHostname}`;
-    return '';
-  }
-
-  // ── LIFF Init ────────────────────────────────────────────────────────────────
-  async function initLiff() {
-    try {
-      await liff.init({ liffId: LIFF_ID });
-
-      if (!liff.isLoggedIn()) {
-        liff.login({ redirectUri: window.location.href });
-        return;
-      }
-
-      // 取得 LINE 使用者資訊
-      try {
-        const profile = await liff.getProfile();
-        lineUserId = profile.userId;
-        lineDisplayName = profile.displayName;
-      } catch (e) {
-        console.warn('[LIFF] Could not get profile:', e);
-      }
-
-    } catch (e) {
-      console.warn('[LIFF] Init failed, running without LIFF:', e.message);
-      // 允許在非 LINE 環境中預覽（開發用）
-    }
-
-    // 從 URL 取得 storeId
-    const params = new URLSearchParams(window.location.search);
-    storeId = params.get('storeId') ? parseInt(params.get('storeId')) : null;
-
-    if (!storeId) {
-      showErrorScreen('找不到店家資訊，請透過 LINE 官方帳號的連結開啟此頁面。');
-      return;
-    }
-
-    await loadStoreAndMenu();
-  }
-
-  async function loadStoreAndMenu() {
-    try {
-      const base = getApiBase();
-      const res = await fetch(`${base}/api/order/store-menu?storeId=${storeId}`);
-      if (!res.ok) throw new Error('無法載入菜單');
-      const data = await res.json();
-
-      // 更新店家名稱
-      if (data.storeName) {
-        document.getElementById('storeNameBadge').textContent = data.storeName;
-        document.title = `線上訂餐 - ${data.storeName}`;
-      }
-
-      menuItems = (data.menuItems || []).filter(m => !m.isCustomPrice);
-      renderMenu();
-
-      // 設定預設取餐時間（1小時後）
-      const defaultTime = new Date(Date.now() + 60 * 60 * 1000);
-      const pad = n => String(n).padStart(2, '0');
-      document.getElementById('pickupTime').value =
-        `${defaultTime.getFullYear()}-${pad(defaultTime.getMonth()+1)}-${pad(defaultTime.getDate())}T${pad(defaultTime.getHours())}:${pad(defaultTime.getMinutes())}`;
-
-      // 顯示主內容
-      hide('loadingScreen');
-      showBlock('mainContent');
-
-    } catch (e) {
-      showErrorScreen('載入菜單失敗：' + e.message);
-    }
-  }
-
-  function showErrorScreen(msg) {
-    hide('loadingScreen');
-    document.getElementById('errorMsg').textContent = msg;
-    show('errorScreen');
-  }
-
-  // ── Menu Rendering ───────────────────────────────────────────────────────────
-  function renderMenu() {
-    const container = document.getElementById('menuList');
-    if (!menuItems.length) {
-      container.innerHTML = '<div class="empty-menu">目前尚無菜單項目</div>';
-      return;
-    }
-    container.innerHTML = menuItems.map(item => `
-      <div class="menu-item" id="mi-${item.id}" onclick="toggleItem(${item.id})">
-        <div class="menu-check">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </div>
-        <div class="menu-info">
-          <div class="menu-name">${escHtml(item.name)}</div>
-          <div class="menu-price">$${item.price}</div>
-        </div>
-        <div class="qty-control" onclick="event.stopPropagation()">
-          <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
-          <span class="qty-num" id="qty-${item.id}">1</span>
-          <button class="qty-btn" onclick="changeQty(${item.id}, +1)">+</button>
-        </div>
+// ── 渲染菜單 ──────────────────────────────────────────────────────────────────
+function renderMenu() {
+  const list = document.getElementById("menuList");
+  list.innerHTML = MENU.map(item => `
+    <div class="menu-item" id="item-row-${item.id}">
+      <div class="menu-item-info">
+        <div class="menu-item-name">${item.name}</div>
+        <div class="menu-item-price">$${item.price}</div>
       </div>
-    `).join('');
+      <div class="qty-control">
+        <button type="button" class="qty-btn" onclick="changeQty(${item.id}, -1)" id="minus-${item.id}" disabled>−</button>
+        <div class="qty-display" id="qty-${item.id}">0</div>
+        <button type="button" class="qty-btn" onclick="changeQty(${item.id}, 1)">＋</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ── 調整數量 ──────────────────────────────────────────────────────────────────
+function changeQty(id, delta) {
+  const current = quantities[id];
+  const next = Math.max(0, Math.min(99, current + delta));
+  if (next === current) return;
+  quantities[id] = next;
+
+  document.getElementById(`qty-${id}`).textContent = next;
+  document.getElementById(`minus-${id}`).disabled = (next === 0);
+
+  // 高亮選中的項目
+  const row = document.getElementById(`item-row-${id}`);
+  if (next > 0) {
+    row.style.background = "linear-gradient(90deg, #fef5ec, #fff)";
+  } else {
+    row.style.background = "";
   }
 
-  function toggleItem(id) {
-    const el = document.getElementById(`mi-${id}`);
-    if (selections[id]) {
-      delete selections[id];
-      el.classList.remove('selected');
-    } else {
-      selections[id] = 1;
-      el.classList.add('selected');
-    }
-    updateSummary();
+  updateSummary();
+  document.getElementById("menuError").classList.remove("visible");
+}
+
+// ── 更新摘要 ──────────────────────────────────────────────────────────────────
+function updateSummary() {
+  const selected = MENU.filter(item => quantities[item.id] > 0);
+  const summary = document.getElementById("orderSummary");
+  const summaryItems = document.getElementById("summaryItems");
+  const summaryTotal = document.getElementById("summaryTotal");
+
+  if (selected.length === 0) {
+    summary.classList.remove("visible");
+    return;
   }
 
-  function changeQty(id, delta) {
-    if (!selections[id]) return;
-    selections[id] = Math.max(1, (selections[id] || 1) + delta);
-    document.getElementById(`qty-${id}`).textContent = selections[id];
-    updateSummary();
+  summary.classList.add("visible");
+  let total = 0;
+  summaryItems.innerHTML = selected.map(item => {
+    const subtotal = item.price * quantities[item.id];
+    total += subtotal;
+    return `${item.name} × ${quantities[item.id]}　＄${subtotal}`;
+  }).join("<br/>");
+  summaryTotal.textContent = `$${total}`;
+}
+
+// ── 取得選中的餐點 ─────────────────────────────────────────────────────────────
+function getSelectedItems() {
+  return MENU
+    .filter(item => quantities[item.id] > 0)
+    .map(item => ({ id: item.id, name: item.name, price: item.price, qty: quantities[item.id] }));
+}
+
+// ── 設定預設取餐時間（明天中午）────────────────────────────────────────────────
+function setDefaultPickupTime() {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(12, 0, 0, 0);
+  const pad = n => String(n).padStart(2, "0");
+  const defaultVal = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth()+1)}-${pad(tomorrow.getDate())}T${pad(tomorrow.getHours())}:${pad(tomorrow.getMinutes())}`;
+  document.getElementById("pickupTime").value = defaultVal;
+  // 設定最小時間為現在
+  const minVal = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  document.getElementById("pickupTime").min = minVal;
+}
+
+// ── 表單驗證 ──────────────────────────────────────────────────────────────────
+function validateForm() {
+  let valid = true;
+
+  // 餐點
+  const items = getSelectedItems();
+  if (items.length === 0) {
+    document.getElementById("menuError").classList.add("visible");
+    valid = false;
   }
 
-  function updateSummary() {
-    const selected = Object.keys(selections);
-    if (!selected.length) {
-      document.getElementById('orderSummary').style.display = 'none';
-      return;
-    }
-    let total = 0;
-    let rows = '';
-    selected.forEach(id => {
-      const item = menuItems.find(m => m.id == id);
-      if (!item) return;
-      const qty = selections[id];
-      const sub = item.price * qty;
-      total += sub;
-      rows += `<div class="summary-row"><span>${escHtml(item.name)} × ${qty}</span><span>$${sub}</span></div>`;
+  // 取餐時間
+  const pickupTime = document.getElementById("pickupTime").value;
+  if (!pickupTime) {
+    document.getElementById("pickupTimeError").classList.add("visible");
+    document.getElementById("pickupTime").classList.add("error");
+    valid = false;
+  } else {
+    document.getElementById("pickupTimeError").classList.remove("visible");
+    document.getElementById("pickupTime").classList.remove("error");
+  }
+
+  // 姓氏
+  const name = document.getElementById("customerName").value.trim();
+  if (!name) {
+    document.getElementById("customerNameError").classList.add("visible");
+    document.getElementById("customerName").classList.add("error");
+    valid = false;
+  } else {
+    document.getElementById("customerNameError").classList.remove("visible");
+    document.getElementById("customerName").classList.remove("error");
+  }
+
+  // 手機末三碼
+  const phone = document.getElementById("phoneLastThree").value.trim();
+  if (!phone || !/^\d{3}$/.test(phone)) {
+    document.getElementById("phoneError").classList.add("visible");
+    document.getElementById("phoneLastThree").classList.add("error");
+    valid = false;
+  } else {
+    document.getElementById("phoneError").classList.remove("visible");
+    document.getElementById("phoneLastThree").classList.remove("error");
+  }
+
+  return valid;
+}
+
+// ── 送出訂單 ──────────────────────────────────────────────────────────────────
+document.getElementById("orderForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  if (!validateForm()) {
+    // 滾動到第一個錯誤
+    const firstError = document.querySelector(".field-error.visible, .error");
+    if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  const items = getSelectedItems();
+  const pickupTime = document.getElementById("pickupTime").value;
+  const name = document.getElementById("customerName").value.trim();
+  const phone = document.getElementById("phoneLastThree").value.trim();
+  const note = document.getElementById("note").value.trim();
+
+  // 顯示 loading
+  document.getElementById("loadingOverlay").classList.add("visible");
+  document.getElementById("submitBtn").disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/order/submit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        storeId: STORE_ID,
+        name,
+        phoneLastThree: phone,
+        pickupTime: new Date(pickupTime).toISOString(),
+        items,
+        note: note || undefined,
+      }),
     });
-    document.getElementById('summaryItems').innerHTML = rows;
-    document.getElementById('summaryTotal').textContent = '$' + total;
-    document.getElementById('orderSummary').style.display = 'block';
-  }
 
-  // ── Submit ───────────────────────────────────────────────────────────────────
-  async function submitOrder() {
-    clearError();
+    const data = await res.json();
 
-    const name = document.getElementById('custName').value.trim();
-    const phone = document.getElementById('custPhone').value.trim();
-    const pickupTime = document.getElementById('pickupTime').value;
-    const note = document.getElementById('custNote').value.trim();
-
-    if (!name) { showError('請輸入姓名'); return; }
-    if (!phone || !/^\d{3}$/.test(phone)) { showError('請輸入正確的電話末三碼（3位數字）'); return; }
-    if (!pickupTime) { showError('請選擇取餐時間'); return; }
-
-    const selectedItems = Object.keys(selections).map(id => {
-      const item = menuItems.find(m => m.id == id);
-      return { id: parseInt(id), name: item.name, price: item.price, qty: selections[id] };
-    });
-    if (!selectedItems.length) { showError('請至少選擇一項餐點'); return; }
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = '送出中...';
-
-    try {
-      const base = getApiBase();
-      const res = await fetch(`${base}/api/order/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          storeId,
-          name,
-          phoneLastThree: phone,
-          pickupTime,
-          note,
-          items: selectedItems,
-          lineUserId,
-          lineDisplayName,
-        })
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || '提交失敗');
-
-      // 顯示成功畫面
-      showSuccessScreen({ name, phone, pickupTime, selectedItems });
-
-    } catch (e) {
-      showError(e.message || '網路錯誤，請稍後重試');
-      btn.disabled = false;
-      btn.textContent = '確認下單';
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "訂單送出失敗，請稍後再試");
     }
+
+    // 顯示成功畫面
+    showSuccess({ name, phone, pickupTime, items, note, orderId: data.orderId });
+
+  } catch (err) {
+    alert("❌ " + (err.message || "訂單送出失敗，請稍後再試"));
+    document.getElementById("submitBtn").disabled = false;
+  } finally {
+    document.getElementById("loadingOverlay").classList.remove("visible");
   }
+});
 
-  function showSuccessScreen({ name, phone, pickupTime, selectedItems }) {
-    const total = selectedItems.reduce((s, i) => s + i.price * i.qty, 0);
-    const timeStr = new Date(pickupTime).toLocaleString('zh-TW', {
-      month: 'numeric', day: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
+// ── 顯示成功畫面 ──────────────────────────────────────────────────────────────
+function showSuccess({ name, phone, pickupTime, items, note, orderId }) {
+  document.getElementById("orderForm").style.display = "none";
+  const successScreen = document.getElementById("successScreen");
+  successScreen.classList.add("visible");
 
-    let rows = `
-      <h3>訂單摘要</h3>
-      <div class="row"><span>姓名</span><span>${escHtml(name)}</span></div>
-      <div class="row"><span>電話末三碼</span><span>${escHtml(phone)}</span></div>
-      <div class="row"><span>取餐時間</span><span>${timeStr}</span></div>
-      <div style="border-top:1px solid var(--border);margin:10px 0;"></div>
-    `;
-    selectedItems.forEach(i => {
-      rows += `<div class="row"><span>${escHtml(i.name)} × ${i.qty}</span><span>$${i.price * i.qty}</span></div>`;
-    });
-    rows += `<div class="row" style="font-weight:700;color:var(--primary);margin-top:6px;"><span>總金額</span><span>$${total}</span></div>`;
+  const dt = new Date(pickupTime);
+  const timeStr = `${dt.getFullYear()}/${String(dt.getMonth()+1).padStart(2,"0")}/${String(dt.getDate()).padStart(2,"0")} ${String(dt.getHours()).padStart(2,"0")}:${String(dt.getMinutes()).padStart(2,"0")}`;
 
-    document.getElementById('successSummary').innerHTML = rows;
-    hide('loadingScreen');
-    document.getElementById('mainContent').style.display = 'none';
-    show('successScreen');
-  }
+  const itemsStr = items.map(i => `${i.name} × ${i.qty}`).join("、");
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
 
-  function closeLiff() {
-    if (liff && liff.closeWindow) {
-      liff.closeWindow();
-    } else {
-      window.close();
-    }
-  }
+  document.getElementById("successDetail").innerHTML = `
+    <div class="success-detail-row"><span class="success-detail-label">訂單編號：</span>#${orderId || "---"}</div>
+    <div class="success-detail-row"><span class="success-detail-label">姓名：</span>${name}</div>
+    <div class="success-detail-row"><span class="success-detail-label">手機末三碼：</span>${phone}</div>
+    <div class="success-detail-row"><span class="success-detail-label">取餐時間：</span>${timeStr}</div>
+    <div class="success-detail-row"><span class="success-detail-label">餐點內容：</span>${itemsStr}</div>
+    <div class="success-detail-row"><span class="success-detail-label">合計金額：</span>$${total}</div>
+    ${note ? `<div class="success-detail-row"><span class="success-detail-label">備註：</span>${note}</div>` : ""}
+  `;
 
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
-  // ── Start ────────────────────────────────────────────────────────────────────
-  initLiff();
+// ── 重置表單 ──────────────────────────────────────────────────────────────────
+function resetForm() {
+  MENU.forEach(item => { quantities[item.id] = 0; });
+  document.getElementById("orderForm").reset();
+  document.getElementById("orderForm").style.display = "block";
+  document.getElementById("successScreen").classList.remove("visible");
+  document.getElementById("submitBtn").disabled = false;
+  renderMenu();
+  updateSummary();
+  setDefaultPickupTime();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ── 手機末三碼只允許數字 ──────────────────────────────────────────────────────
+document.getElementById("phoneLastThree").addEventListener("input", function() {
+  this.value = this.value.replace(/\D/g, "").slice(0, 3);
+});
+
+// ── 初始化 ────────────────────────────────────────────────────────────────────
+renderMenu();
+setDefaultPickupTime();
 </script>
 </body>
 </html>
