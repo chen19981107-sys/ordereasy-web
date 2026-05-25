@@ -80,11 +80,6 @@ async function startServer() {
     res.sendFile(orderFormPath);
   });
 
-  // 404 handler for API routes
-  app.use("/api", (_req, res) => {
-    res.status(404).json({ error: "API endpoint not found" });
-  });
-
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -92,6 +87,11 @@ async function startServer() {
       createContext,
     }),
   );
+
+  // 404 handler for API routes (must be after tRPC middleware)
+  app.use("/api", (_req, res) => {
+    res.status(404).json({ error: "API endpoint not found" });
+  });
 
   // Health check for root path - don't serve HTML here to avoid breaking Expo
   app.get("/", (_req, res) => {
