@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total, SUM(totalPrice) as revenue FROM orders WHERE storeId = 1 AND DATE(pickupTime) = CURDATE() AND status = 'picked_up';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute SELECT COUNT(*) as total, SUM(totalPrice) as revenue FROM orders WHERE storeId = 1 AND DATE(pickupTime) = CURDATE() AND status = 'picked_up';",
+  "rows": [
+    {
+      "total": "5",
+      "revenue": "188000"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\trevenue\n5\t188000\n",
+  "stderr": "",
+  "execution_time_ms": 1782
+}

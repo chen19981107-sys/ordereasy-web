@@ -1,0 +1,2 @@
+ALTER TABLE `store_settings` ADD `notificationSoundType` enum('default','crisp','gentle','urgent') DEFAULT 'default' NOT NULL;--> statement-breakpoint
+ALTER TABLE `store_settings` ADD `notificationVibrationPattern` enum('light','medium','strong') DEFAULT 'medium' NOT NULL;

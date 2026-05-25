@@ -1,0 +1,1 @@
+ALTER TABLE `stores` ADD `lineGroupId` varchar(200);

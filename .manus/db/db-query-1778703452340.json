@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE orders SET totalQuantity = (\n  SELECT COALESCE(SUM(CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(mealContent, ' x', -1), ',', 1) AS UNSIGNED)), 0)\n  FROM (SELECT mealContent) AS temp\n  WHERE FIND_IN_SET(SUBSTRING_INDEX(SUBSTRING_INDEX(mealContent, ' x', -1), ',', 1), mealContent)\n) WHERE totalQuantity = 0;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute UPDATE orders SET totalQuantity = (\n  SELECT COALESCE(SUM(CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(mealContent, ' x', -1), ',', 1) AS UNSIGNED)), 0)\n  FROM (SELECT mealContent) AS temp\n  WHERE FIND_IN_SET(SUBSTRING_INDEX(SUBSTRING_INDEX(mealContent, ' x', -1), ',', 1), mealContent)\n) WHERE totalQuantity = 0;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1821
+}

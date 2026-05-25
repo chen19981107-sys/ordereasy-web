@@ -1,0 +1,9 @@
+{
+  "query": "DELETE FROM orders WHERE status = 'pending';\nALTER TABLE orders MODIFY COLUMN status ENUM('making', 'ready', 'picked_up') DEFAULT 'making' NOT NULL;\nALTER TABLE orders ADD COLUMN IF NOT EXISTS completedAt timestamp NULL;\nALTER TABLE orders ADD COLUMN IF NOT EXISTS pickedUpAt timestamp NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute DELETE FROM orders WHERE status = 'pending';\nALTER TABLE orders MODIFY COLUMN status ENUM('making', 'ready', 'picked_up') DEFAULT 'making' NOT NULL;\nALTER TABLE orders ADD COLUMN IF NOT EXISTS completedAt timestamp NULL;\nALTER TABLE orders ADD COLUMN IF NOT EXISTS pickedUpAt timestamp NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3318
+}

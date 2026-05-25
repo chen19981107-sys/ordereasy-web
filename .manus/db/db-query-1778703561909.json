@@ -1,0 +1,46 @@
+{
+  "query": "SELECT id, status, pickupTime, totalQuantity FROM orders WHERE DATE(pickupTime) = CURDATE() ORDER BY pickupTime DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute SELECT id, status, pickupTime, totalQuantity FROM orders WHERE DATE(pickupTime) = CURDATE() ORDER BY pickupTime DESC;",
+  "rows": [
+    {
+      "id": "60006",
+      "status": "picked_up",
+      "pickupTime": "2026-05-13 19:30:00",
+      "totalQuantity": "2"
+    },
+    {
+      "id": "60005",
+      "status": "picked_up",
+      "pickupTime": "2026-05-13 19:20:00",
+      "totalQuantity": "4"
+    },
+    {
+      "id": "60004",
+      "status": "picked_up",
+      "pickupTime": "2026-05-13 19:05:00",
+      "totalQuantity": "2"
+    },
+    {
+      "id": "60003",
+      "status": "picked_up",
+      "pickupTime": "2026-05-13 18:50:00",
+      "totalQuantity": "1"
+    },
+    {
+      "id": "60002",
+      "status": "picked_up",
+      "pickupTime": "2026-05-13 18:40:00",
+      "totalQuantity": "1"
+    },
+    {
+      "id": "60001",
+      "status": "picked_up",
+      "pickupTime": "2026-05-13 18:35:00",
+      "totalQuantity": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstatus\tpickupTime\ttotalQuantity\n60006\tpicked_up\t2026-05-13 19:30:00\t2\n60005\tpicked_up\t2026-05-13 19:20:00\t4\n60004\tpicked_up\t2026-05-13 19:05:00\t2\n60003\tpicked_up\t2026-05-13 18:50:00\t1\n60002\tpicked_up\t2026-05-13 18:40:00\t1\n60001\tpicked_up\t2026-05-13 18:35:00\t2\n",
+  "stderr": "",
+  "execution_time_ms": 1772
+}

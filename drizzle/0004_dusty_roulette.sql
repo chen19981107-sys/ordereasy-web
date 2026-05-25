@@ -1,0 +1,1 @@
+ALTER TABLE `menu_items` ADD `isCustomPrice` boolean DEFAULT false NOT NULL;

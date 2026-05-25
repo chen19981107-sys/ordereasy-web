@@ -1,0 +1,1 @@
+ALTER TABLE `store_settings` ADD `fontSizeMultiplier` decimal(3,2) DEFAULT '1.00' NOT NULL;

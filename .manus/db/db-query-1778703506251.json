@@ -1,0 +1,13 @@
+{
+  "query": "SELECT SUM(totalQuantity) as totalQuantity FROM orders WHERE DATE(pickupTime) = CURDATE() AND status = 'picked_up';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute SELECT SUM(totalQuantity) as totalQuantity FROM orders WHERE DATE(pickupTime) = CURDATE() AND status = 'picked_up';",
+  "rows": [
+    {
+      "totalQuantity": "12"
+    }
+  ],
+  "messages": [],
+  "stdout": "totalQuantity\n12\n",
+  "stderr": "",
+  "execution_time_ms": 1854
+}

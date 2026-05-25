@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, eventDate, title, venueRental FROM calendar_events ORDER BY eventDate DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute SELECT id, eventDate, title, venueRental FROM calendar_events ORDER BY eventDate DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "30002",
+      "eventDate": "2026-05-13 19:32:18",
+      "title": "苗栗富邦",
+      "venueRental": "70000"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\teventDate\ttitle\tvenueRental\n30002\t2026-05-13 19:32:18\t苗栗富邦\t70000\n",
+  "stderr": "",
+  "execution_time_ms": 1837
+}

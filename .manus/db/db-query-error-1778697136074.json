@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE orders MODIFY COLUMN status ENUM('making', 'ready', 'picked_up') DEFAULT 'making' NOT NULL;\nALTER TABLE orders ADD COLUMN IF NOT EXISTS completedAt timestamp NULL;\nALTER TABLE orders ADD COLUMN IF NOT EXISTS pickedUpAt timestamp NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute ALTER TABLE orders MODIFY COLUMN status ENUM('making', 'ready', 'picked_up') DEFAULT 'making' NOT NULL;\nALTER TABLE orders ADD COLUMN IF NOT EXISTS completedAt timestamp NULL;\nALTER TABLE orders ADD COLUMN IF NOT EXISTS pickedUpAt timestamp NULL;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1265 (01000) at line 1: Data truncated for column 'status', value is 'pending'"
+  ]
+}

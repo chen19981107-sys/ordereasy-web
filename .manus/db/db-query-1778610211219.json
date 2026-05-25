@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `stores` CHANGE COLUMN `username` `phoneNumber` varchar(10) NOT NULL; ALTER TABLE `stores` DROP INDEX `stores_username_unique`; ALTER TABLE `stores` ADD CONSTRAINT `stores_phoneNumber_unique` UNIQUE(`phoneNumber`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute ALTER TABLE `stores` CHANGE COLUMN `username` `phoneNumber` varchar(10) NOT NULL; ALTER TABLE `stores` DROP INDEX `stores_username_unique`; ALTER TABLE `stores` ADD CONSTRAINT `stores_phoneNumber_unique` UNIQUE(`phoneNumber`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3119
+}

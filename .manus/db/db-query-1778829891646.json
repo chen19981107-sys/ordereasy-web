@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE stores ADD COLUMN facebookPageId VARCHAR(100), ADD COLUMN facebookAccessToken VARCHAR(500), ADD COLUMN lineChannelId VARCHAR(100), ADD COLUMN lineChannelSecret VARCHAR(500), ADD COLUMN lineAccessToken VARCHAR(500);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 23R5Ydnk6VxFESB.root --database WMiTPpxpSLDLdbpzX2aMcN --execute ALTER TABLE stores ADD COLUMN facebookPageId VARCHAR(100), ADD COLUMN facebookAccessToken VARCHAR(500), ADD COLUMN lineChannelId VARCHAR(100), ADD COLUMN lineChannelSecret VARCHAR(500), ADD COLUMN lineAccessToken VARCHAR(500);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2555
+}
