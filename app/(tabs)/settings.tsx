@@ -6,12 +6,10 @@ import {
   StyleSheet,
   Switch,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useAppAuth } from "@/lib/auth-context";
 import { useColors } from "@/hooks/use-colors";
 import { useFontSize } from "@/lib/font-size-context";
@@ -25,17 +23,11 @@ export default function SettingsScreen() {
 
   const [notificationSound, setNotificationSound] = useState(true);
   const [notificationVibration, setNotificationVibration] = useState(true);
-  const [lineGroupId, setLineGroupId] = useState("");
-  const [postAuthorName, setPostAuthorName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   const settingsQuery = trpc.settings.get.useQuery();
   const updateSettingsMutation = trpc.settings.update.useMutation();
-  const lineGroupQuery = trpc.lineGroup.getGroupId.useQuery();
-  const setLineGroupIdMutation = trpc.lineGroup.setGroupId.useMutation();
-  const postAuthorQuery = trpc.lineGroup.getPostAuthorName.useQuery();
-  const setPostAuthorMutation = trpc.lineGroup.setPostAuthorName.useMutation();
 
   useEffect(() => {
     if (settingsQuery.isLoading === false) {
@@ -46,18 +38,6 @@ export default function SettingsScreen() {
       setIsLoading(false);
     }
   }, [settingsQuery.isLoading, settingsQuery.data]);
-
-  useEffect(() => {
-    if (lineGroupQuery.data?.groupId) {
-      setLineGroupId(lineGroupQuery.data.groupId);
-    }
-  }, [lineGroupQuery.data]);
-
-  useEffect(() => {
-    if (postAuthorQuery.data?.authorName) {
-      setPostAuthorName(postAuthorQuery.data.authorName);
-    }
-  }, [postAuthorQuery.data]);
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
@@ -75,44 +55,10 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleSaveLineGroupId = async () => {
-    if (!lineGroupId.trim()) {
-      Alert.alert("錯誤", "請輸入 LINE 群組 ID");
-      return;
-    }
-    setIsSaving(true);
-    try {
-      await setLineGroupIdMutation.mutateAsync({ groupId: lineGroupId });
-      Alert.alert("成功", "LINE 群組 ID 已保存，系統將自動監聽該群組的訂單留言");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "保存失敗";
-      Alert.alert("錯誤", message);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleSavePostAuthorName = async () => {
-    if (!postAuthorName.trim()) {
-      Alert.alert("錯誤", "請輸入貼文帳號名稱");
-      return;
-    }
-    setIsSaving(true);
-    try {
-      await setPostAuthorMutation.mutateAsync({ authorName: postAuthorName });
-      Alert.alert("成功", "貼文帳號名稱已保存，系統將只監聽該帳號發布的貼文");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "保存失敗";
-      Alert.alert("錯誤", message);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleFontSizeChange = async (value: number) => {
     // 立即保存到本地
     await setFontSizeMultiplier(value);
-    
+
     // 自動保存到後端（無需用戶確認）
     try {
       await updateSettingsMutation.mutateAsync({
@@ -126,7 +72,6 @@ export default function SettingsScreen() {
   // 在組件卸載時確保已保存
   useEffect(() => {
     return () => {
-      // 組件卸載時，確保最新的字體大小已保存到後端
       if (settingsQuery.data && fontSizeMultiplier !== (settingsQuery.data.fontSizeMultiplier ?? 1.0)) {
         updateSettingsMutation.mutate({
           fontSizeMultiplier,
@@ -179,17 +124,6 @@ export default function SettingsScreen() {
       color: colors.foreground,
       flex: 1,
     },
-    input: {
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      fontSize: 16 * fontSizeMultiplier,
-      color: colors.foreground,
-      borderWidth: 1,
-      borderColor: colors.border,
-      marginBottom: 12,
-    },
     button: {
       backgroundColor: colors.primary,
       borderRadius: 12,
@@ -229,55 +163,6 @@ export default function SettingsScreen() {
           />
         </View>
 
-        {/* LINE Settings */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>LINE 群組記事本設定</Text>
-          <Text style={{ fontSize: 14 * fontSizeMultiplier, color: colors.muted, marginBottom: 12 }}>
-            輸入要監聽的 LINE 群組 ID，系統會自動抓取該群組記事本貼文下的訂單留言。顧客在貼文下留言「姓名 取餐時間 餐點內容」格式的訂單，系統會自動建立。
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="輸入 LINE 群組 ID"
-            value={lineGroupId}
-            onChangeText={setLineGroupId}
-            placeholderTextColor={colors.muted}
-          />
-          <TouchableOpacity
-            style={[styles.button, isSaving && { opacity: 0.7 }]}
-            onPress={handleSaveLineGroupId}
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>保存群組設定</Text>
-            )}
-          </TouchableOpacity>
-
-          <Text style={[styles.sectionTitle, { marginTop: 16 }]}>貼文帳號名稱</Text>
-          <Text style={{ fontSize: 14 * fontSizeMultiplier, color: colors.muted, marginBottom: 12 }}>
-            輸入要監聽的貼文帳號名稱，系統只會監聽該帳號發布的貼文下的訂單留言。
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="輸入貼文帳號名稱"
-            value={postAuthorName}
-            onChangeText={setPostAuthorName}
-            placeholderTextColor={colors.muted}
-          />
-          <TouchableOpacity
-            style={[styles.button, isSaving && { opacity: 0.7 }]}
-            onPress={handleSavePostAuthorName}
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>保存帳號名稱</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
         {/* Notification Settings */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>通知設定</Text>
@@ -291,8 +176,6 @@ export default function SettingsScreen() {
             />
           </View>
 
-
-
           <View style={styles.settingRow}>
             <Text style={styles.settingLabel}>震動提示</Text>
             <Switch
@@ -301,8 +184,6 @@ export default function SettingsScreen() {
               trackColor={{ false: colors.border, true: colors.primary }}
             />
           </View>
-
-
 
           <TouchableOpacity
             style={[styles.button, isSaving && { opacity: 0.7 }]}
