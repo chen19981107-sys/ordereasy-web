@@ -26,26 +26,33 @@ export const API_BASE_URL = env.apiBaseUrl;
 
 /**
  * Get the API base URL, deriving from current hostname if not set.
- * Metro runs on 8081, API server runs on 3000.
- * URL pattern: https://PORT-sandboxid.region.domain
+ *
+ * - Dev sandbox: Metro on 8081, API on 3000 → replace port prefix
+ * - Production (published): frontend + backend on same domain → use relative URL ("")
+ * - Native (Expo Go / installed app): use relative URL or EXPO_PUBLIC_API_BASE_URL
  */
 export function getApiBaseUrl(): string {
-  // If API_BASE_URL is set, use it
+  // If API_BASE_URL is explicitly set, use it (highest priority)
   if (API_BASE_URL) {
     return API_BASE_URL.replace(/\/$/, "");
   }
 
-  // On web, derive from current hostname by replacing port 8081 with 3000
+  // On web, determine API URL from current hostname
   if (ReactNative.Platform.OS === "web" && typeof window !== "undefined" && window.location) {
     const { protocol, hostname } = window.location;
-    // Pattern: 8081-sandboxid.region.domain -> 3000-sandboxid.region.domain
+    // Dev sandbox pattern: 8081-sandboxid.region.domain → 3000-sandboxid.region.domain
     const apiHostname = hostname.replace(/^8081-/, "3000-");
     if (apiHostname !== hostname) {
+      // Development mode: API is on a different port
       return `${protocol}//${apiHostname}`;
     }
+    // Production (published): frontend and backend share the same domain
+    // Return empty string so /api/trpc resolves as a relative URL
+    return "";
   }
 
-  // Fallback to empty (will use relative URL)
+  // Native fallback: use empty string (relative URL won't work on native,
+  // but EXPO_PUBLIC_API_BASE_URL should be set for native production builds)
   return "";
 }
 

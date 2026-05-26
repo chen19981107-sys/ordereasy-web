@@ -93,10 +93,41 @@ async function startServer() {
     res.status(404).json({ error: "API endpoint not found" });
   });
 
-  // Health check for root path - don't serve HTML here to avoid breaking Expo
-  app.get("/", (_req, res) => {
-    res.json({ ok: true, service: "OrderEasy API Server" });
-  });
+  // In production, serve the Expo web static output
+  // The web build is exported to the 'web-build' directory by Expo
+  const isProduction = process.env.NODE_ENV === "production";
+  if (isProduction) {
+    const webBuildDir = path.resolve(__dirname, "../../web-build");
+    const fs = await import("fs");
+    if (fs.existsSync(webBuildDir)) {
+      // Serve Expo static web build
+      app.use(express.static(webBuildDir));
+      // SPA fallback: serve index.html for all non-API routes
+      app.get("*", (req, res) => {
+        // Don't serve HTML for /order (handled above) or /api routes
+        if (req.path.startsWith("/api") || req.path === "/order") {
+          res.status(404).json({ error: "Not found" });
+          return;
+        }
+        const indexPath = path.resolve(webBuildDir, "index.html");
+        if (fs.existsSync(indexPath)) {
+          res.sendFile(indexPath);
+        } else {
+          res.status(404).json({ error: "Web build not found" });
+        }
+      });
+    } else {
+      // Fallback if web-build doesn't exist
+      app.get("/", (_req, res) => {
+        res.json({ ok: true, service: "OrderEasy API Server" });
+      });
+    }
+  } else {
+    // Development: just return health check at root
+    app.get("/", (_req, res) => {
+      res.json({ ok: true, service: "OrderEasy API Server" });
+    });
+  }
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
