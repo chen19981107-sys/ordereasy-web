@@ -2,26 +2,25 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ㄚ嬤灶咖｜線上點餐系統</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ㄚ嬤灶咖｜線上點餐</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     :root {
-      --primary: #c0392b;
-      --primary-dark: #96281b;
-      --primary-light: #f9e8e6;
-      --accent: #e67e22;
-      --accent-light: #fef5ec;
-      --bg: #faf8f5;
+      --orange: #E8711A;
+      --orange-dark: #c45c10;
+      --orange-light: #fff4ec;
+      --orange-border: #f5c89a;
+      --red: #c0392b;
+      --bg: #f5f5f5;
       --surface: #ffffff;
-      --border: #e8e0d8;
-      --text: #2c2c2c;
-      --text-muted: #7a7068;
+      --border: #e0e0e0;
+      --text: #1a1a1a;
+      --text-sub: #666666;
+      --text-hint: #999999;
       --success: #27ae60;
-      --success-light: #eafaf1;
-      --radius: 14px;
-      --shadow: 0 2px 16px rgba(0,0,0,0.08);
+      --radius: 12px;
     }
 
     body {
@@ -29,129 +28,42 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 0 0 60px;
+      padding-bottom: 40px;
     }
 
     /* ── Header ── */
     .header {
-      background: linear-gradient(135deg, #8b1a0e 0%, #c0392b 50%, #e74c3c 100%);
+      background: linear-gradient(160deg, #f0820a 0%, #E8711A 60%, #d4600f 100%);
+      padding: 32px 20px 28px;
+      text-align: center;
       color: white;
-      text-align: center;
-      padding: 48px 24px 40px;
-      position: relative;
-      overflow: hidden;
     }
-    .header::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-      pointer-events: none;
-    }
-    .header-emoji { font-size: 52px; margin-bottom: 12px; display: block; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
-    .header h1 { font-size: 28px; font-weight: 900; letter-spacing: 1px; margin-bottom: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.2); }
-    .header p { font-size: 15px; opacity: 0.9; line-height: 1.6; max-width: 320px; margin: 0 auto; }
+    .header-emoji { font-size: 44px; display: block; margin-bottom: 8px; }
+    .header h1 { font-size: 24px; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .header p { font-size: 13px; opacity: 0.88; line-height: 1.5; }
 
-    /* ── Container ── */
-    .container { max-width: 600px; margin: 0 auto; padding: 0 16px; }
-
-    /* ── Section Card ── */
-    .card {
+    /* ── Section ── */
+    .section {
       background: var(--surface);
+      margin: 12px 12px 0;
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      margin-top: 20px;
       overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
     }
-    .card-header {
-      background: linear-gradient(90deg, var(--primary-light), #fff);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .card-header-icon { font-size: 22px; }
-    .card-header-title { font-size: 17px; font-weight: 800; color: var(--primary-dark); }
-    .card-header-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .card-body { padding: 20px; }
-
-    /* ── Menu Items ── */
-    .menu-item {
-      display: flex;
-      align-items: center;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-      gap: 12px;
-    }
-    .menu-item:last-child { border-bottom: none; }
-    .menu-item-info { flex: 1; }
-    .menu-item-name { font-size: 16px; font-weight: 700; color: var(--text); }
-    .menu-item-price { font-size: 14px; color: var(--accent); font-weight: 700; margin-top: 3px; }
-    .qty-control {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      background: var(--bg);
-      border-radius: 40px;
-      border: 1.5px solid var(--border);
-      overflow: hidden;
-    }
-    .qty-btn {
-      width: 36px;
-      height: 36px;
-      border: none;
-      background: transparent;
-      font-size: 20px;
+    .section-title {
+      font-size: 13px;
       font-weight: 700;
-      cursor: pointer;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s;
-      -webkit-tap-highlight-color: transparent;
+      color: var(--text-sub);
+      padding: 14px 16px 0;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
-    .qty-btn:active { background: var(--primary-light); }
-    .qty-btn:disabled { color: #ccc; cursor: default; }
-    .qty-display {
-      width: 36px;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text);
-      user-select: none;
-    }
+    .section-title .req { color: var(--orange); margin-left: 4px; }
 
-    /* ── Order Summary ── */
-    .order-summary {
-      background: var(--accent-light);
-      border: 1.5px solid #f0c080;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 16px;
-      display: none;
-    }
-    .order-summary.visible { display: block; }
-    .order-summary-title { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
-    .order-summary-item { font-size: 14px; color: var(--text); line-height: 1.8; }
-    .order-summary-total {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #f0c080;
-      font-size: 16px;
-      font-weight: 900;
-      color: var(--primary-dark);
-      display: flex;
-      justify-content: space-between;
-    }
-
-    /* ── Form Fields ── */
-    .field { margin-bottom: 20px; }
-    .field:last-child { margin-bottom: 0; }
+    /* ── Field ── */
+    .field { padding: 12px 16px; }
     .field-label {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text);
       margin-bottom: 8px;
@@ -159,135 +71,183 @@
       align-items: center;
       gap: 6px;
     }
-    .required-badge {
-      background: var(--primary);
-      color: white;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    .optional-badge {
-      background: #e0e0e0;
-      color: #888;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
+    .req-dot {
+      width: 6px; height: 6px;
+      background: var(--orange);
+      border-radius: 50%;
+      flex-shrink: 0;
     }
     .field input[type="text"],
     .field input[type="datetime-local"],
     .field textarea {
       width: 100%;
-      padding: 13px 16px;
+      padding: 12px 14px;
       border: 1.5px solid var(--border);
       border-radius: 10px;
       font-size: 16px;
       font-family: inherit;
       color: var(--text);
-      background: var(--bg);
+      background: #fafafa;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s, background 0.2s;
       -webkit-appearance: none;
     }
     .field input:focus,
     .field textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+      border-color: var(--orange);
       background: white;
     }
-    .field input.error,
-    .field textarea.error {
-      border-color: var(--primary);
-      background: var(--primary-light);
-    }
-    .field textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
-    .field-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
-    .field-error { font-size: 12px; color: var(--primary); margin-top: 6px; display: none; font-weight: 600; }
-    .field-error.visible { display: block; }
+    .field input.err,
+    .field textarea.err { border-color: var(--red); background: #fff8f8; }
+    .field textarea { resize: none; min-height: 80px; line-height: 1.6; }
+    .field-hint { font-size: 12px; color: var(--text-hint); margin-top: 5px; }
+    .field-err-msg { font-size: 12px; color: var(--red); margin-top: 5px; font-weight: 600; display: none; }
+    .field-err-msg.show { display: block; }
+    .field + .field { border-top: 1px solid #f0f0f0; }
 
-    /* ── Submit Button ── */
-    .submit-section { margin-top: 24px; }
+    /* ── Menu Items ── */
+    .menu-list { padding: 4px 0; }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 13px 16px;
+      border-bottom: 1px solid #f5f5f5;
+      transition: background 0.15s;
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item.selected { background: var(--orange-light); }
+    .menu-info { flex: 1; min-width: 0; }
+    .menu-name { font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .menu-price { font-size: 14px; font-weight: 700; color: var(--orange); margin-top: 2px; }
+    .qty-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-left: 12px;
+      flex-shrink: 0;
+    }
+    .qty-btn {
+      width: 34px; height: 34px;
+      border: 1.5px solid var(--border);
+      background: white;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s, border-color 0.12s;
+      user-select: none;
+    }
+    .qty-btn:active { background: var(--orange-light); border-color: var(--orange); }
+    .qty-btn:disabled { color: #ccc; border-color: #e8e8e8; background: #fafafa; cursor: default; }
+    .qty-num {
+      width: 40px;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      user-select: none;
+    }
+    .qty-num.active { color: var(--orange); }
+
+    /* ── 已選摘要 ── */
+    .summary-box {
+      margin: 0 12px;
+      background: var(--orange-light);
+      border: 1.5px solid var(--orange-border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: none;
+    }
+    .summary-box.show { display: block; }
+    .summary-title { font-size: 12px; font-weight: 700; color: var(--orange); margin-bottom: 8px; letter-spacing: 0.3px; }
+    .summary-row { font-size: 14px; color: var(--text); line-height: 1.9; display: flex; justify-content: space-between; }
+    .summary-divider { border: none; border-top: 1px solid var(--orange-border); margin: 8px 0; }
+    .summary-total { font-size: 16px; font-weight: 900; color: var(--orange-dark); display: flex; justify-content: space-between; }
+    .menu-err { font-size: 12px; color: var(--red); font-weight: 600; padding: 0 16px 12px; display: none; }
+    .menu-err.show { display: block; }
+
+    /* ── Submit ── */
+    .submit-wrap { padding: 20px 12px 0; }
     .submit-btn {
       width: 100%;
-      padding: 18px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      padding: 17px;
+      background: linear-gradient(135deg, var(--orange), #f0820a);
       color: white;
       border: none;
       border-radius: 14px;
       font-size: 18px;
       font-weight: 900;
       font-family: inherit;
-      cursor: pointer;
       letter-spacing: 1px;
-      box-shadow: 0 4px 20px rgba(192,57,43,0.35);
-      transition: transform 0.15s, box-shadow 0.15s;
-      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(232,113,26,0.4);
+      transition: transform 0.12s, box-shadow 0.12s;
     }
-    .submit-btn:active { transform: scale(0.98); box-shadow: 0 2px 10px rgba(192,57,43,0.25); }
-    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .submit-note { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+    .submit-btn:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(232,113,26,0.3); }
+    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .submit-note { text-align: center; font-size: 12px; color: var(--text-hint); margin-top: 10px; }
 
-    /* ── Success Screen ── */
-    .success-screen {
-      display: none;
+    /* ── Success ── */
+    .success-wrap { display: none; padding: 20px 12px; }
+    .success-wrap.show { display: block; }
+    .success-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 32px 20px;
       text-align: center;
-      padding: 60px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
     }
-    .success-screen.visible { display: block; }
-    .success-icon { font-size: 72px; margin-bottom: 20px; }
-    .success-title { font-size: 26px; font-weight: 900; color: var(--success); margin-bottom: 12px; }
-    .success-subtitle { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; }
+    .success-icon { font-size: 64px; margin-bottom: 16px; }
+    .success-title { font-size: 22px; font-weight: 900; color: var(--success); margin-bottom: 8px; }
+    .success-sub { font-size: 14px; color: var(--text-sub); line-height: 1.7; margin-bottom: 20px; }
     .success-detail {
-      background: var(--success-light);
+      background: #f0faf5;
       border: 1.5px solid #a9dfbf;
-      border-radius: 12px;
-      padding: 18px;
+      border-radius: 10px;
+      padding: 16px;
       text-align: left;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
-    .success-detail-row { font-size: 14px; color: var(--text); line-height: 2; }
-    .success-detail-label { font-weight: 700; color: var(--success); }
+    .detail-row { font-size: 14px; color: var(--text); line-height: 2; }
+    .detail-label { font-weight: 700; color: var(--success); }
     .new-order-btn {
-      background: var(--surface);
-      border: 2px solid var(--primary);
-      color: var(--primary);
-      padding: 14px 32px;
-      border-radius: 12px;
-      font-size: 16px;
+      background: white;
+      border: 2px solid var(--orange);
+      color: var(--orange);
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 15px;
       font-weight: 700;
       font-family: inherit;
       cursor: pointer;
     }
 
-    /* ── Loading Overlay ── */
-    .loading-overlay {
+    /* ── Loading ── */
+    .loading-mask {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
+      background: rgba(0,0,0,0.4);
       z-index: 999;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
-    .loading-overlay.visible { display: flex; }
+    .loading-mask.show { display: flex; }
     .spinner {
-      width: 48px; height: 48px;
-      border: 5px solid rgba(255,255,255,0.3);
+      width: 44px; height: 44px;
+      border: 4px solid rgba(255,255,255,0.3);
       border-top-color: white;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.75s linear infinite;
     }
-    .loading-text { color: white; font-size: 16px; font-weight: 700; }
+    .loading-text { color: white; font-size: 15px; font-weight: 700; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Responsive ── */
-    @media (max-width: 480px) {
-      .header h1 { font-size: 22px; }
-      .header p { font-size: 13px; }
-    }
   </style>
 </head>
 <body>
@@ -295,369 +255,253 @@
 <!-- Header -->
 <div class="header">
   <span class="header-emoji">🍱</span>
-  <h1>ㄚ嬤灶咖｜線上點餐系統</h1>
+  <h1>ㄚ嬤灶咖｜線上點餐</h1>
   <p>每一道餐點，都是ㄚ嬤灶咖用心準備的熟悉滋味。</p>
 </div>
 
-<div class="container">
+<form id="form" novalidate>
 
-  <!-- Form -->
-  <form id="orderForm" novalidate>
-
-    <!-- 餐點選擇 -->
-    <div class="card">
-      <div class="card-header">
-        <span class="card-header-icon">🍽️</span>
-        <div>
-          <div class="card-header-title">餐點選擇 <span class="required-badge">必填</span></div>
-          <div class="card-header-subtitle">請至少選擇一項餐點</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div id="menuList">
-          <!-- 動態生成 -->
-        </div>
-
-        <!-- 訂單摘要 -->
-        <div class="order-summary" id="orderSummary">
-          <div class="order-summary-title">📋 已選餐點</div>
-          <div id="summaryItems" class="order-summary-item"></div>
-          <div class="order-summary-total">
-            <span>合計</span>
-            <span id="summaryTotal">$0</span>
-          </div>
-        </div>
-        <div class="field-error" id="menuError">⚠️ 請至少選擇一項餐點</div>
-      </div>
+  <!-- 姓氏 -->
+  <div class="section" style="margin-top:16px;">
+    <div class="section-title">顧客資訊</div>
+    <div class="field">
+      <div class="field-label"><span class="req-dot"></span>您的姓氏</div>
+      <input type="text" id="name" placeholder="例：王先生、小美小姐" maxlength="20" />
+      <div class="field-err-msg" id="nameErr">請填寫您的姓氏</div>
     </div>
-
-    <!-- 取餐時間 -->
-    <div class="card">
-      <div class="card-header">
-        <span class="card-header-icon">🕐</span>
-        <div>
-          <div class="card-header-title">取餐時間 <span class="required-badge">必填</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="field">
-          <input type="datetime-local" id="pickupTime" name="pickupTime" required />
-          <div class="field-error" id="pickupTimeError">⚠️ 請選擇取餐時間</div>
-        </div>
-      </div>
+    <div class="field">
+      <div class="field-label"><span class="req-dot"></span>手機末三碼</div>
+      <input type="text" id="phone" placeholder="000" maxlength="3" inputmode="numeric" />
+      <div class="field-hint">用於取餐時核對身份</div>
+      <div class="field-err-msg" id="phoneErr">請填寫手機末三碼（3位數字）</div>
     </div>
-
-    <!-- 顧客資訊 -->
-    <div class="card">
-      <div class="card-header">
-        <span class="card-header-icon">👤</span>
-        <div>
-          <div class="card-header-title">顧客資訊</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="field">
-          <div class="field-label">您的姓氏 <span class="required-badge">必填</span></div>
-          <input type="text" id="customerName" name="customerName"
-            placeholder="例：王先生、小美小姐" required maxlength="20" />
-          <div class="field-error" id="customerNameError">⚠️ 請填寫您的姓氏</div>
-        </div>
-        <div class="field">
-          <div class="field-label">手機末三碼 <span class="required-badge">必填</span></div>
-          <input type="text" id="phoneLastThree" name="phoneLastThree"
-            placeholder="000" required maxlength="3" inputmode="numeric"
-            pattern="\d{3}" />
-          <div class="field-hint">用於取餐時核對身份</div>
-          <div class="field-error" id="phoneError">⚠️ 請填寫手機末三碼（3位數字）</div>
-        </div>
-        <div class="field">
-          <div class="field-label">備註 <span class="optional-badge">選填</span></div>
-          <textarea id="note" name="note"
-            placeholder="例：不要蔥、醬汁多一點" rows="3"></textarea>
-        </div>
-      </div>
+    <div class="field">
+      <div class="field-label"><span class="req-dot"></span>取餐時間</div>
+      <input type="datetime-local" id="pickupTime" />
+      <div class="field-err-msg" id="timeErr">請選擇取餐時間</div>
     </div>
+  </div>
 
-    <!-- Submit -->
-    <div class="submit-section">
-      <button type="submit" class="submit-btn" id="submitBtn">
-        🛒 確認送出訂單
-      </button>
-      <p class="submit-note">送出後將無法修改，請確認餐點內容後再送出</p>
+  <!-- 餐點選擇 -->
+  <div class="section" style="margin-top:12px;">
+    <div class="section-title">餐點選擇 <span class="req">*必填</span></div>
+    <div class="menu-list" id="menuList"></div>
+    <div class="menu-err" id="menuErr">請至少選擇一項餐點</div>
+  </div>
+
+  <!-- 已選摘要 -->
+  <div class="summary-box" id="summaryBox" style="margin-top:12px;">
+    <div class="summary-title">📋 已選餐點</div>
+    <div id="summaryItems"></div>
+    <hr class="summary-divider" />
+    <div class="summary-total"><span>合計</span><span id="summaryTotal">$0</span></div>
+  </div>
+
+  <!-- 備註 -->
+  <div class="section" style="margin-top:12px;">
+    <div class="field">
+      <div class="field-label" style="font-weight:600; color: var(--text-sub);">備註（選填）</div>
+      <textarea id="note" placeholder="例：不要蔥、醬汁多一點" rows="3"></textarea>
     </div>
+  </div>
 
-  </form>
+  <!-- Submit -->
+  <div class="submit-wrap">
+    <button type="submit" class="submit-btn" id="submitBtn">確認下單</button>
+    <p class="submit-note">送出後將無法修改，請確認內容後再送出</p>
+  </div>
 
-  <!-- Success Screen -->
-  <div class="success-screen" id="successScreen">
+</form>
+
+<!-- Success -->
+<div class="success-wrap" id="successWrap">
+  <div class="success-card">
     <div class="success-icon">🎉</div>
-    <div class="success-title">訂單已成功送出！</div>
-    <div class="success-subtitle">
-      感謝您的訂購，我們會盡快為您準備餐點。<br/>
-      請於指定時間前來取餐。
-    </div>
+    <div class="success-title">訂單送出成功！</div>
+    <div class="success-sub">感謝您的訂購，我們會盡快為您準備餐點。<br/>請於指定時間前來取餐。</div>
     <div class="success-detail" id="successDetail"></div>
     <button class="new-order-btn" onclick="resetForm()">再次訂購</button>
   </div>
-
 </div>
 
-<!-- Loading Overlay -->
-<div class="loading-overlay" id="loadingOverlay">
+<!-- Loading -->
+<div class="loading-mask" id="loadingMask">
   <div class="spinner"></div>
   <div class="loading-text">訂單送出中…</div>
 </div>
 
 <script>
-// ── 菜單資料 ──────────────────────────────────────────────────────────────────
 const MENU = [
-  { id: 1,  name: "泰式拌飯",   price: 140 },
-  { id: 2,  name: "咖哩雞飯",   price: 140 },
-  { id: 3,  name: "燒肉丼飯",   price: 100 },
-  { id: 4,  name: "親子丼飯",   price: 100 },
-  { id: 5,  name: "牛肉丼飯",   price: 110 },
-  { id: 6,  name: "鯛魚丼飯",   price: 110 },
-  { id: 7,  name: "虱目魚丼飯", price: 110 },
-  { id: 8,  name: "豬多多",     price: 140 },
-  { id: 9,  name: "牛多多",     price: 160 },
+  { id: 1, name: "泰式拌飯",   price: 140 },
+  { id: 2, name: "咖哩雞飯",   price: 140 },
+  { id: 3, name: "燒肉丼飯",   price: 100 },
+  { id: 4, name: "親子丼飯",   price: 100 },
+  { id: 5, name: "牛肉丼飯",   price: 110 },
+  { id: 6, name: "鯛魚丼飯",   price: 110 },
+  { id: 7, name: "虱目魚丼飯", price: 110 },
+  { id: 8, name: "豬多多",     price: 140 },
+  { id: 9, name: "牛多多",     price: 160 },
 ];
 
-// 取得 storeId（從 URL 參數）
 const urlParams = new URLSearchParams(window.location.search);
 const STORE_ID = urlParams.get("storeId") || "1";
 const API_BASE = window.location.origin;
-
-// ── 數量狀態 ──────────────────────────────────────────────────────────────────
-const quantities = {};
-MENU.forEach(item => { quantities[item.id] = 0; });
+const qty = {};
+MENU.forEach(m => qty[m.id] = 0);
 
 // ── 渲染菜單 ──────────────────────────────────────────────────────────────────
 function renderMenu() {
-  const list = document.getElementById("menuList");
-  list.innerHTML = MENU.map(item => `
-    <div class="menu-item" id="item-row-${item.id}">
-      <div class="menu-item-info">
-        <div class="menu-item-name">${item.name}</div>
-        <div class="menu-item-price">$${item.price}</div>
+  document.getElementById("menuList").innerHTML = MENU.map(m => `
+    <div class="menu-item" id="row-${m.id}">
+      <div class="menu-info">
+        <div class="menu-name">${m.name}</div>
+        <div class="menu-price">$${m.price}</div>
       </div>
-      <div class="qty-control">
-        <button type="button" class="qty-btn" onclick="changeQty(${item.id}, -1)" id="minus-${item.id}" disabled>−</button>
-        <div class="qty-display" id="qty-${item.id}">0</div>
-        <button type="button" class="qty-btn" onclick="changeQty(${item.id}, 1)">＋</button>
+      <div class="qty-wrap">
+        <button type="button" class="qty-btn" id="minus-${m.id}" onclick="chg(${m.id},-1)" disabled>−</button>
+        <div class="qty-num" id="num-${m.id}">0</div>
+        <button type="button" class="qty-btn" onclick="chg(${m.id},1)">＋</button>
       </div>
     </div>
   `).join("");
 }
 
-// ── 調整數量 ──────────────────────────────────────────────────────────────────
-function changeQty(id, delta) {
-  const current = quantities[id];
-  const next = Math.max(0, Math.min(99, current + delta));
-  if (next === current) return;
-  quantities[id] = next;
-
-  document.getElementById(`qty-${id}`).textContent = next;
-  document.getElementById(`minus-${id}`).disabled = (next === 0);
-
-  // 高亮選中的項目
-  const row = document.getElementById(`item-row-${id}`);
-  if (next > 0) {
-    row.style.background = "linear-gradient(90deg, #fef5ec, #fff)";
-  } else {
-    row.style.background = "";
-  }
-
+function chg(id, d) {
+  qty[id] = Math.max(0, Math.min(99, qty[id] + d));
+  document.getElementById(`num-${id}`).textContent = qty[id];
+  document.getElementById(`num-${id}`).className = "qty-num" + (qty[id] > 0 ? " active" : "");
+  document.getElementById(`minus-${id}`).disabled = qty[id] === 0;
+  document.getElementById(`row-${id}`).className = "menu-item" + (qty[id] > 0 ? " selected" : "");
   updateSummary();
-  document.getElementById("menuError").classList.remove("visible");
+  if (qty[id] > 0) document.getElementById("menuErr").classList.remove("show");
 }
 
-// ── 更新摘要 ──────────────────────────────────────────────────────────────────
+function getSelected() {
+  return MENU.filter(m => qty[m.id] > 0).map(m => ({ id: m.id, name: m.name, price: m.price, qty: qty[m.id] }));
+}
+
 function updateSummary() {
-  const selected = MENU.filter(item => quantities[item.id] > 0);
-  const summary = document.getElementById("orderSummary");
-  const summaryItems = document.getElementById("summaryItems");
-  const summaryTotal = document.getElementById("summaryTotal");
-
-  if (selected.length === 0) {
-    summary.classList.remove("visible");
-    return;
-  }
-
-  summary.classList.add("visible");
+  const sel = getSelected();
+  const box = document.getElementById("summaryBox");
+  if (!sel.length) { box.classList.remove("show"); return; }
+  box.classList.add("show");
   let total = 0;
-  summaryItems.innerHTML = selected.map(item => {
-    const subtotal = item.price * quantities[item.id];
-    total += subtotal;
-    return `${item.name} × ${quantities[item.id]}　＄${subtotal}`;
-  }).join("<br/>");
-  summaryTotal.textContent = `$${total}`;
+  document.getElementById("summaryItems").innerHTML = sel.map(i => {
+    const sub = i.price * i.qty;
+    total += sub;
+    return `<div class="summary-row"><span>${i.name} × ${i.qty}</span><span>$${sub}</span></div>`;
+  }).join("");
+  document.getElementById("summaryTotal").textContent = `$${total}`;
 }
 
-// ── 取得選中的餐點 ─────────────────────────────────────────────────────────────
-function getSelectedItems() {
-  return MENU
-    .filter(item => quantities[item.id] > 0)
-    .map(item => ({ id: item.id, name: item.name, price: item.price, qty: quantities[item.id] }));
-}
-
-// ── 設定預設取餐時間（明天中午）────────────────────────────────────────────────
-function setDefaultPickupTime() {
+// ── 預設取餐時間 ──────────────────────────────────────────────────────────────
+function setDefaultTime() {
   const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(12, 0, 0, 0);
-  const pad = n => String(n).padStart(2, "0");
-  const defaultVal = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth()+1)}-${pad(tomorrow.getDate())}T${pad(tomorrow.getHours())}:${pad(tomorrow.getMinutes())}`;
-  document.getElementById("pickupTime").value = defaultVal;
-  // 設定最小時間為現在
-  const minVal = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  document.getElementById("pickupTime").min = minVal;
+  const d = new Date(now);
+  d.setDate(d.getDate() + 1);
+  d.setHours(12, 0, 0, 0);
+  const p = n => String(n).padStart(2, "0");
+  document.getElementById("pickupTime").value =
+    `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  const min = `${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}T${p(now.getHours())}:${p(now.getMinutes())}`;
+  document.getElementById("pickupTime").min = min;
 }
 
-// ── 表單驗證 ──────────────────────────────────────────────────────────────────
-function validateForm() {
-  let valid = true;
+// ── 手機末三碼只允許數字 ──────────────────────────────────────────────────────
+document.getElementById("phone").addEventListener("input", function() {
+  this.value = this.value.replace(/\D/g, "").slice(0, 3);
+});
 
-  // 餐點
-  const items = getSelectedItems();
-  if (items.length === 0) {
-    document.getElementById("menuError").classList.add("visible");
-    valid = false;
-  }
-
-  // 取餐時間
-  const pickupTime = document.getElementById("pickupTime").value;
-  if (!pickupTime) {
-    document.getElementById("pickupTimeError").classList.add("visible");
-    document.getElementById("pickupTime").classList.add("error");
-    valid = false;
-  } else {
-    document.getElementById("pickupTimeError").classList.remove("visible");
-    document.getElementById("pickupTime").classList.remove("error");
-  }
-
-  // 姓氏
-  const name = document.getElementById("customerName").value.trim();
-  if (!name) {
-    document.getElementById("customerNameError").classList.add("visible");
-    document.getElementById("customerName").classList.add("error");
-    valid = false;
-  } else {
-    document.getElementById("customerNameError").classList.remove("visible");
-    document.getElementById("customerName").classList.remove("error");
-  }
-
-  // 手機末三碼
-  const phone = document.getElementById("phoneLastThree").value.trim();
-  if (!phone || !/^\d{3}$/.test(phone)) {
-    document.getElementById("phoneError").classList.add("visible");
-    document.getElementById("phoneLastThree").classList.add("error");
-    valid = false;
-  } else {
-    document.getElementById("phoneError").classList.remove("visible");
-    document.getElementById("phoneLastThree").classList.remove("error");
-  }
-
-  return valid;
+// ── 驗證 ──────────────────────────────────────────────────────────────────────
+function validate() {
+  let ok = true;
+  const setErr = (id, errId, cond) => {
+    const el = document.getElementById(id);
+    const em = document.getElementById(errId);
+    if (cond) { el.classList.add("err"); em.classList.add("show"); ok = false; }
+    else { el.classList.remove("err"); em.classList.remove("show"); }
+  };
+  setErr("name", "nameErr", !document.getElementById("name").value.trim());
+  setErr("phone", "phoneErr", !/^\d{3}$/.test(document.getElementById("phone").value.trim()));
+  setErr("pickupTime", "timeErr", !document.getElementById("pickupTime").value);
+  const noMenu = getSelected().length === 0;
+  if (noMenu) document.getElementById("menuErr").classList.add("show");
+  else document.getElementById("menuErr").classList.remove("show");
+  if (noMenu) ok = false;
+  return ok;
 }
 
-// ── 送出訂單 ──────────────────────────────────────────────────────────────────
-document.getElementById("orderForm").addEventListener("submit", async function(e) {
+// ── 送出 ──────────────────────────────────────────────────────────────────────
+document.getElementById("form").addEventListener("submit", async e => {
   e.preventDefault();
-  if (!validateForm()) {
-    // 滾動到第一個錯誤
-    const firstError = document.querySelector(".field-error.visible, .error");
-    if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (!validate()) {
+    const first = document.querySelector(".err, .menu-err.show");
+    if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
-
-  const items = getSelectedItems();
+  const items = getSelected();
   const pickupTime = document.getElementById("pickupTime").value;
-  const name = document.getElementById("customerName").value.trim();
-  const phone = document.getElementById("phoneLastThree").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
   const note = document.getElementById("note").value.trim();
 
-  // 顯示 loading
-  document.getElementById("loadingOverlay").classList.add("visible");
+  document.getElementById("loadingMask").classList.add("show");
   document.getElementById("submitBtn").disabled = true;
 
   try {
     const res = await fetch(`${API_BASE}/api/order/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        storeId: STORE_ID,
-        name,
-        phoneLastThree: phone,
-        pickupTime: new Date(pickupTime).toISOString(),
-        items,
-        note: note || undefined,
-      }),
+      body: JSON.stringify({ storeId: STORE_ID, name, phoneLastThree: phone, pickupTime: new Date(pickupTime).toISOString(), items, note: note || undefined }),
     });
-
     const data = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || "訂單送出失敗，請稍後再試");
-    }
-
-    // 顯示成功畫面
+    if (!res.ok || !data.success) throw new Error(data.error || "訂單送出失敗");
     showSuccess({ name, phone, pickupTime, items, note, orderId: data.orderId });
-
   } catch (err) {
     alert("❌ " + (err.message || "訂單送出失敗，請稍後再試"));
     document.getElementById("submitBtn").disabled = false;
   } finally {
-    document.getElementById("loadingOverlay").classList.remove("visible");
+    document.getElementById("loadingMask").classList.remove("show");
   }
 });
 
-// ── 顯示成功畫面 ──────────────────────────────────────────────────────────────
+// ── 成功畫面 ──────────────────────────────────────────────────────────────────
 function showSuccess({ name, phone, pickupTime, items, note, orderId }) {
-  document.getElementById("orderForm").style.display = "none";
-  const successScreen = document.getElementById("successScreen");
-  successScreen.classList.add("visible");
-
+  document.getElementById("form").style.display = "none";
+  document.getElementById("summaryBox").style.display = "none";
+  document.getElementById("successWrap").classList.add("show");
   const dt = new Date(pickupTime);
-  const timeStr = `${dt.getFullYear()}/${String(dt.getMonth()+1).padStart(2,"0")}/${String(dt.getDate()).padStart(2,"0")} ${String(dt.getHours()).padStart(2,"0")}:${String(dt.getMinutes()).padStart(2,"0")}`;
-
-  const itemsStr = items.map(i => `${i.name} × ${i.qty}`).join("、");
+  const p = n => String(n).padStart(2, "0");
+  const timeStr = `${dt.getFullYear()}/${p(dt.getMonth()+1)}/${p(dt.getDate())} ${p(dt.getHours())}:${p(dt.getMinutes())}`;
   const total = items.reduce((s, i) => s + i.price * i.qty, 0);
-
   document.getElementById("successDetail").innerHTML = `
-    <div class="success-detail-row"><span class="success-detail-label">訂單編號：</span>#${orderId || "---"}</div>
-    <div class="success-detail-row"><span class="success-detail-label">姓名：</span>${name}</div>
-    <div class="success-detail-row"><span class="success-detail-label">手機末三碼：</span>${phone}</div>
-    <div class="success-detail-row"><span class="success-detail-label">取餐時間：</span>${timeStr}</div>
-    <div class="success-detail-row"><span class="success-detail-label">餐點內容：</span>${itemsStr}</div>
-    <div class="success-detail-row"><span class="success-detail-label">合計金額：</span>$${total}</div>
-    ${note ? `<div class="success-detail-row"><span class="success-detail-label">備註：</span>${note}</div>` : ""}
+    <div class="detail-row"><span class="detail-label">訂單編號：</span>#${orderId || "---"}</div>
+    <div class="detail-row"><span class="detail-label">姓名：</span>${name}</div>
+    <div class="detail-row"><span class="detail-label">手機末三碼：</span>${phone}</div>
+    <div class="detail-row"><span class="detail-label">取餐時間：</span>${timeStr}</div>
+    <div class="detail-row"><span class="detail-label">餐點：</span>${items.map(i => `${i.name}×${i.qty}`).join("、")}</div>
+    <div class="detail-row"><span class="detail-label">合計：</span>$${total}</div>
+    ${note ? `<div class="detail-row"><span class="detail-label">備註：</span>${note}</div>` : ""}
   `;
-
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ── 重置表單 ──────────────────────────────────────────────────────────────────
 function resetForm() {
-  MENU.forEach(item => { quantities[item.id] = 0; });
-  document.getElementById("orderForm").reset();
-  document.getElementById("orderForm").style.display = "block";
-  document.getElementById("successScreen").classList.remove("visible");
+  MENU.forEach(m => qty[m.id] = 0);
+  document.getElementById("form").reset();
+  document.getElementById("form").style.display = "block";
+  document.getElementById("summaryBox").style.display = "";
+  document.getElementById("successWrap").classList.remove("show");
   document.getElementById("submitBtn").disabled = false;
   renderMenu();
   updateSummary();
-  setDefaultPickupTime();
+  setDefaultTime();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ── 手機末三碼只允許數字 ──────────────────────────────────────────────────────
-document.getElementById("phoneLastThree").addEventListener("input", function() {
-  this.value = this.value.replace(/\D/g, "").slice(0, 3);
-});
-
 // ── 初始化 ────────────────────────────────────────────────────────────────────
 renderMenu();
-setDefaultPickupTime();
+setDefaultTime();
 </script>
 </body>
 </html>
