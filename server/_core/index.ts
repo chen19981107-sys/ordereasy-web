@@ -74,6 +74,12 @@ async function startServer() {
     res.json({ ok: true, timestamp: Date.now() });
   });
 
+  // Serve login page
+  app.get("/login", (_req, res) => {
+    const loginPath = path.resolve(__dirname, "../../public/login.html");
+    res.sendFile(loginPath);
+  });
+
   // Serve order form
   app.get("/order", (_req, res) => {
     const orderFormPath = path.resolve(__dirname, "../../public/order-form.html");

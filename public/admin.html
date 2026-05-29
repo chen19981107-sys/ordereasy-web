@@ -43,26 +43,74 @@
         .header-title h1 {
             font-size: 24px;
             color: #ff6b35;
+            font-weight: 600;
+        }
+
+        .header-icon {
+            font-size: 28px;
         }
 
         .logout-btn {
-            background-color: #ff6b35;
+            background-color: #ff3b30;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .logout-btn:hover {
-            background-color: #e55a24;
+            background-color: #e53b30;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background-color: white;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .tab-btn.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .tab-btn:hover {
+            background-color: #fafafa;
+        }
+
+        .tab-icon {
+            font-size: 18px;
         }
 
         .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            display: none;
+        }
+
+        .content.active {
+            display: block;
         }
 
         .card {
@@ -70,192 +118,251 @@
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         .card h2 {
             font-size: 18px;
             margin-bottom: 15px;
             color: #333;
-            border-bottom: 2px solid #ff6b35;
-            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0b7dda;
+        }
+
+        .btn-danger {
+            background-color: #ff3b30;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e53b30;
         }
 
         .calendar {
             width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
         }
 
-        .calendar-header {
+        .calendar th,
+        .calendar td {
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .calendar th {
+            background-color: #fafafa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .calendar td {
+            height: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar td:hover {
+            background-color: #fff5f0;
+        }
+
+        .calendar td.selected {
+            background-color: #ff6b35;
+            color: white;
+        }
+
+        .calendar td.today {
+            background-color: #ffe6d5;
+            font-weight: 600;
+        }
+
+        .orders-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .order-item {
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ff6b35;
+        }
+
+        .order-item h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .order-item p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .order-status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .order-status.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .order-actions button {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .month-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .calendar-header button {
+        .month-nav button {
             background-color: #ff6b35;
             color: white;
             border: none;
             padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
+            font-weight: 500;
         }
 
-        .calendar-header button:hover {
+        .month-nav button:hover {
             background-color: #e55a24;
         }
 
-        .calendar-header h3 {
-            font-size: 18px;
-            color: #ff6b35;
-        }
-
-        .weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-
-        .weekday {
-            text-align: center;
-            font-weight: bold;
-            color: #666;
-            padding: 10px 0;
-            font-size: 12px;
-        }
-
-        .days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-        }
-
-        .day {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            background-color: #fafafa;
-            transition: all 0.3s ease;
-        }
-
-        .day:hover {
-            background-color: #fff;
-            border-color: #ff6b35;
-        }
-
-        .day.today {
-            background-color: #ff6b35;
-            color: white;
-            border-color: #ff6b35;
-            font-weight: bold;
-        }
-
-        .day.other-month {
-            color: #ccc;
-        }
-
-        .location-settings {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .location-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background-color: #fafafa;
-            border-radius: 4px;
-        }
-
-        .location-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .location-item label {
-            flex: 1;
-            cursor: pointer;
-        }
-
-        .location-item input[type="text"] {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .location-item button {
-            background-color: #ff6b35;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .location-item button:hover {
-            background-color: #e55a24;
-        }
-
-        .add-location-btn {
-            background-color: #ff6b35;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            width: 100%;
-        }
-
-        .add-location-btn:hover {
-            background-color: #e55a24;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .stat-item {
-            background-color: #fafafa;
-            padding: 15px;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
+        .month-nav h3 {
+            font-size: 16px;
             color: #ff6b35;
         }
 
         @media (max-width: 768px) {
-            .content {
+            .form-row {
                 grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                flex: 1 1 50%;
             }
 
             header {
                 flex-direction: column;
-                gap: 10px;
+                gap: 15px;
+                text-align: center;
             }
         }
     </style>
@@ -264,197 +371,318 @@
     <div class="container">
         <header>
             <div class="header-title">
-                <span style="font-size: 24px;">📋</span>
+                <span class="header-icon">📋</span>
                 <h1>輕鬆點餐系統 - 店家後台</h1>
             </div>
-            <button class="logout-btn" onclick="logout()">登出</button>
+            <button class="logout-btn" onclick="handleLogout()">登出</button>
         </header>
 
-        <div class="content">
-            <!-- 日曆卡片 -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'orders')">
+                <span class="tab-icon">📋</span>
+                訂單查看
+            </button>
+            <button class="tab-btn" onclick="switchTab(event, 'settings')">
+                <span class="tab-icon">⚙️</span>
+                店家設定
+            </button>
+        </div>
+
+        <!-- 訂單查看頁面 -->
+        <div id="orders" class="content active">
             <div class="card">
                 <h2>訂單日期</h2>
-                <div class="calendar">
-                    <div class="calendar-header">
-                        <button onclick="previousMonth()">上一月</button>
-                        <h3 id="monthYear">2026年 5月</h3>
-                        <button onclick="nextMonth()">下一月</button>
-                    </div>
-                    <div class="weekdays">
-                        <div class="weekday">日</div>
-                        <div class="weekday">一</div>
-                        <div class="weekday">二</div>
-                        <div class="weekday">三</div>
-                        <div class="weekday">四</div>
-                        <div class="weekday">五</div>
-                        <div class="weekday">六</div>
-                    </div>
-                    <div class="days" id="calendarDays"></div>
+                <div class="month-nav">
+                    <button onclick="previousMonth()">上一月</button>
+                    <h3 id="month-display">2026年 5月</h3>
+                    <button onclick="nextMonth()">下一月</button>
                 </div>
-                <div class="stats" style="margin-top: 20px;">
-                    <div class="stat-item">
-                        <div class="stat-label">訂單日期</div>
-                        <div class="stat-value" id="orderDateCount">0</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">訂單狀態</div>
-                        <div class="stat-value" id="orderStatusCount">0</div>
-                    </div>
-                </div>
+                <table class="calendar" id="calendar"></table>
             </div>
 
-            <!-- 出車地點設定卡片 -->
             <div class="card">
-                <h2>設定出車地點</h2>
-                <div class="location-settings">
-                    <div id="locationsList"></div>
-                    <button class="add-location-btn" onclick="addLocation()">+ 新增地點</button>
+                <h2>訂單狀態</h2>
+                <div id="orders-container" class="orders-list">
+                    <div class="placeholder">選擇日期查看訂單</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- 店家設定頁面 -->
+        <div id="settings" class="content">
+            <div class="card">
+                <h2>店家基本資訊</h2>
+                <form onsubmit="handleUpdateShop(event)">
+                    <div class="form-group">
+                        <label>店家名稱</label>
+                        <input type="text" id="shop-name" placeholder="輸入店家名稱" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>帳號</label>
+                            <input type="text" id="shop-username" placeholder="輸入帳號" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>密碼</label>
+                            <input type="password" id="shop-password" placeholder="輸入新密碼（留空不修改）">
+                        </div>
+                        <div class="form-group">
+                            <label>店家 ID</label>
+                            <input type="text" id="shop-id" placeholder="店家 ID" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>營業地址</label>
+                        <input type="text" id="shop-address" placeholder="輸入營業地址">
+                    </div>
+
+                    <div class="form-group">
+                        <label>聯絡電話</label>
+                        <input type="tel" id="shop-phone" placeholder="輸入聯絡電話">
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">保存設定</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>菜單設定</h2>
+                <div class="placeholder">菜單設定功能開發中...</div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentDate = new Date(2026, 4, 29); // May 29, 2026
-        let locations = [];
+        let currentDate = new Date();
+        let selectedDate = null;
 
-        function initCalendar() {
+        // 初始化
+        function init() {
+            // 檢查是否已登入
+            const shopUser = localStorage.getItem('shopUser');
+            if (!shopUser) {
+                window.location.href = '/login';
+                return;
+            }
+
+            // 載入店家資訊
+            loadShopInfo();
+
+            // 初始化日曆
             renderCalendar();
-            loadLocations();
         }
 
+        // 切換標籤
+        function switchTab(event, tab) {
+            event.preventDefault();
+
+            // 更新按鈕狀態
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.closest('.tab-btn').classList.add('active');
+
+            // 更新內容顯示
+            const contents = document.querySelectorAll('.content');
+            contents.forEach(c => c.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+        }
+
+        // 載入店家資訊
+        function loadShopInfo() {
+            const shopUser = JSON.parse(localStorage.getItem('shopUser') || '{}');
+            const shops = JSON.parse(localStorage.getItem('shops') || '[]');
+            const currentShop = shops.find(s => s.username === shopUser.username);
+
+            if (currentShop) {
+                document.getElementById('shop-name').value = currentShop.name || '';
+                document.getElementById('shop-username').value = currentShop.username || '';
+                document.getElementById('shop-id').value = currentShop.id || '';
+                document.getElementById('shop-address').value = currentShop.address || '';
+                document.getElementById('shop-phone').value = currentShop.phone || '';
+            }
+        }
+
+        // 更新店家資訊
+        function handleUpdateShop(event) {
+            event.preventDefault();
+
+            const shopUser = JSON.parse(localStorage.getItem('shopUser') || '{}');
+            let shops = JSON.parse(localStorage.getItem('shops') || '[]');
+
+            const shopIndex = shops.findIndex(s => s.username === shopUser.username);
+            if (shopIndex === -1) {
+                alert('找不到店家資訊');
+                return;
+            }
+
+            const name = document.getElementById('shop-name').value.trim();
+            const password = document.getElementById('shop-password').value.trim();
+            const address = document.getElementById('shop-address').value.trim();
+            const phone = document.getElementById('shop-phone').value.trim();
+
+            if (!name) {
+                alert('店家名稱不能為空');
+                return;
+            }
+
+            shops[shopIndex].name = name;
+            if (password) {
+                shops[shopIndex].password = password;
+            }
+            shops[shopIndex].address = address;
+            shops[shopIndex].phone = phone;
+
+            localStorage.setItem('shops', JSON.stringify(shops));
+            alert('設定已保存');
+        }
+
+        // 渲染日曆
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            
-            // Update header
+
+            // 更新月份顯示
             const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-            document.getElementById('monthYear').textContent = `${year}年 ${monthNames[month]}`;
+            document.getElementById('month-display').textContent = `${year}年 ${monthNames[month]}`;
 
-            // Get first day of month and number of days
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            // 計算日曆
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
 
-            const calendarDays = document.getElementById('calendarDays');
-            calendarDays.innerHTML = '';
+            let calendarHTML = '<tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr>';
+            let dayCounter = 1;
 
-            // Previous month days
-            for (let i = firstDay - 1; i >= 0; i--) {
-                const day = document.createElement('div');
-                day.className = 'day other-month';
-                day.textContent = daysInPrevMonth - i;
-                calendarDays.appendChild(day);
+            // 前面的空白
+            calendarHTML += '<tr>';
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                calendarHTML += '<td></td>';
             }
 
-            // Current month days
-            const today = new Date();
-            for (let i = 1; i <= daysInMonth; i++) {
-                const day = document.createElement('div');
-                day.className = 'day';
-                day.textContent = i;
-
-                // Check if it's today
-                if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) {
-                    day.classList.add('today');
+            // 日期
+            let cellsInRow = startingDayOfWeek;
+            while (dayCounter <= daysInMonth) {
+                if (cellsInRow === 7) {
+                    calendarHTML += '</tr><tr>';
+                    cellsInRow = 0;
                 }
 
-                day.onclick = () => selectDate(year, month, i);
-                calendarDays.appendChild(day);
+                const today = new Date();
+                const isToday = dayCounter === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                const isSelected = selectedDate && dayCounter === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear();
+
+                let className = '';
+                if (isToday) className += 'today ';
+                if (isSelected) className += 'selected';
+
+                calendarHTML += `<td class="${className}" onclick="selectDate(${dayCounter})">${dayCounter}</td>`;
+                dayCounter++;
+                cellsInRow++;
             }
 
-            // Next month days
-            const totalCells = calendarDays.children.length;
-            const remainingCells = 42 - totalCells; // 6 rows * 7 days
-            for (let i = 1; i <= remainingCells; i++) {
-                const day = document.createElement('div');
-                day.className = 'day other-month';
-                day.textContent = i;
-                calendarDays.appendChild(day);
+            // 後面的空白
+            while (cellsInRow < 7) {
+                calendarHTML += '<td></td>';
+                cellsInRow++;
             }
+            calendarHTML += '</tr>';
+
+            document.getElementById('calendar').innerHTML = calendarHTML;
         }
 
+        // 選擇日期
+        function selectDate(day) {
+            selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            renderCalendar();
+            loadOrders();
+        }
+
+        // 上一月
         function previousMonth() {
             currentDate.setMonth(currentDate.getMonth() - 1);
+            selectedDate = null;
             renderCalendar();
+            document.getElementById('orders-container').innerHTML = '<div class="placeholder">選擇日期查看訂單</div>';
         }
 
+        // 下一月
         function nextMonth() {
             currentDate.setMonth(currentDate.getMonth() + 1);
+            selectedDate = null;
             renderCalendar();
+            document.getElementById('orders-container').innerHTML = '<div class="placeholder">選擇日期查看訂單</div>';
         }
 
-        function selectDate(year, month, day) {
-            console.log(`Selected: ${year}-${month + 1}-${day}`);
-        }
-
-        function loadLocations() {
-            const savedLocations = localStorage.getItem('locations');
-            if (savedLocations) {
-                locations = JSON.parse(savedLocations);
-            } else {
-                locations = [
-                    { id: 1, name: '東門店', enabled: true },
-                    { id: 2, name: '西門店', enabled: false }
-                ];
+        // 載入訂單
+        function loadOrders() {
+            if (!selectedDate) {
+                document.getElementById('orders-container').innerHTML = '<div class="placeholder">選擇日期查看訂單</div>';
+                return;
             }
-            renderLocations();
+
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const dateStr = selectedDate.toISOString().split('T')[0];
+            const dayOrders = orders.filter(o => o.date === dateStr);
+
+            if (dayOrders.length === 0) {
+                document.getElementById('orders-container').innerHTML = '<div class="placeholder">此日期沒有訂單</div>';
+                return;
+            }
+
+            const container = document.getElementById('orders-container');
+            container.innerHTML = dayOrders.map(order => `
+                <div class="order-item">
+                    <h3>訂單 #${order.id}</h3>
+                    <p>姓名：${order.name}</p>
+                    <p>手機末三碼：${order.phone}</p>
+                    <p>取餐時間：${order.pickupTime}</p>
+                    <p>餐點：${order.items}</p>
+                    <span class="order-status ${order.status === 'completed' ? 'completed' : 'pending'}">
+                        ${order.status === 'completed' ? '已取餐' : '待取餐'}
+                    </span>
+                    <div class="order-actions">
+                        <button class="btn btn-secondary" onclick="markOrderCompleted('${order.id}')">標記已取</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function renderLocations() {
-            const locationsList = document.getElementById('locationsList');
-            locationsList.innerHTML = '';
-
-            locations.forEach((location, index) => {
-                const item = document.createElement('div');
-                item.className = 'location-item';
-                item.innerHTML = `
-                    <input type="checkbox" ${location.enabled ? 'checked' : ''} 
-                           onchange="toggleLocation(${index})">
-                    <input type="text" value="${location.name}" 
-                           onchange="updateLocation(${index}, this.value)">
-                    <button onclick="deleteLocation(${index})">刪除</button>
-                `;
-                locationsList.appendChild(item);
-            });
-
-            saveLocations();
+        // 標記訂單已取
+        function markOrderCompleted(orderId) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex !== -1) {
+                orders[orderIndex].status = 'completed';
+                localStorage.setItem('orders', JSON.stringify(orders));
+                loadOrders();
+            }
         }
 
-        function toggleLocation(index) {
-            locations[index].enabled = !locations[index].enabled;
-            renderLocations();
-        }
-
-        function updateLocation(index, name) {
-            locations[index].name = name;
-            renderLocations();
-        }
-
-        function deleteLocation(index) {
-            locations.splice(index, 1);
-            renderLocations();
-        }
-
-        function addLocation() {
-            const newId = Math.max(...locations.map(l => l.id), 0) + 1;
-            locations.push({ id: newId, name: '新地點', enabled: true });
-            renderLocations();
-        }
-
-        function saveLocations() {
-            localStorage.setItem('locations', JSON.stringify(locations));
-        }
-
-        function logout() {
+        // 登出
+        function handleLogout() {
             if (confirm('確定要登出嗎？')) {
+                localStorage.removeItem('shopUser');
                 localStorage.removeItem('adminUser');
-                window.location.href = '/';
+                window.location.href = '/login';
             }
         }
 
-        // Initialize on page load
-        window.addEventListener('load', initCalendar);
+        // 防止休眠 - 定期發送心跳信號
+        function keepAlive() {
+            fetch('/api/health')
+                .catch(err => console.log('Keep-alive ping failed:', err));
+        }
+
+        // 每 5 分鐘發送一次心跳
+        setInterval(keepAlive, 5 * 60 * 1000);
+
+        // 頁面加載時初始化
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
