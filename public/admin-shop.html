@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>輕鬆點餐系統 - 店家管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            color: #ff6b35;
+            font-weight: 600;
+        }
+
+        .header-icon {
+            font-size: 28px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background-color: white;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .tab-btn.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .tab-btn:hover {
+            background-color: #f9f9f9;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #229954;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-info {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .shop-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .shop-card {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .shop-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ff6b35;
+        }
+
+        .shop-card p {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .shop-card .btn-group {
+            margin-top: 10px;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* 防止休眠 - 定期發送心跳信號 */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #27ae60;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <span class="header-icon">⚙️</span>
+                <h1>輕鬆點餐系統 - 店家管理</h1>
+            </div>
+            <div>
+                <span class="status-indicator"></span>
+                <span style="font-size: 12px; color: #999;">系統正常</span>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('manage')">🏪 店家管理</button>
+            <button class="tab-btn" onclick="switchTab('orders')">📋 訂單查看</button>
+        </div>
+
+        <!-- 店家管理標籤 -->
+        <div id="manage" class="tab-content active">
+            <div class="section">
+                <h2>新增店家</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>店家名稱</label>
+                        <input type="text" id="shop-name" placeholder="例：東門店">
+                    </div>
+                    <div class="form-group">
+                        <label>帳號</label>
+                        <input type="text" id="shop-username" placeholder="例：shop001">
+                    </div>
+                    <div class="form-group">
+                        <label>密碼</label>
+                        <input type="password" id="shop-password" placeholder="輸入密碼">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addShop()">新增店家</button>
+            </div>
+
+            <div class="section">
+                <h2>現有店家</h2>
+                <div class="search-box">
+                    <input type="text" id="search-shop" placeholder="搜尋店家名稱或 ID..." onkeyup="filterShops()">
+                </div>
+                <div id="shop-list" class="shop-list"></div>
+            </div>
+        </div>
+
+        <!-- 訂單查看標籤 -->
+        <div id="orders" class="tab-content">
+            <div class="section">
+                <h2>訂單查看</h2>
+                <div class="empty-state">
+                    <p>目前沒有訂單</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化店家數據
+        let shops = [
+            { id: 'S0001', name: '東門店', username: 'chen1107', password: '1234' },
+            { id: 'S0002', name: '信義店', username: 'shop002', password: '5678' },
+            { id: 'S0003', name: '大安店', username: 'shop003', password: '9012' },
+            { id: 'S0004', name: '中山店', username: 'shop004', password: '3456' },
+            { id: 'S0005', name: '松山店', username: 'shop005', password: '7890' }
+        ];
+
+        function switchTab(tabName) {
+            // 隱藏所有標籤內容
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 移除所有標籤按鈕的活動狀態
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 顯示選中的標籤內容
+            document.getElementById(tabName).classList.add('active');
+
+            // 標記選中的標籤按鈕
+            event.target.classList.add('active');
+        }
+
+        function renderShops() {
+            const shopList = document.getElementById('shop-list');
+            if (shops.length === 0) {
+                shopList.innerHTML = '<div class="empty-state"><p>還沒有店家</p></div>';
+                return;
+            }
+
+            shopList.innerHTML = shops.map(shop => `
+                <div class="shop-card">
+                    <h3>${shop.name}</h3>
+                    <p>帳號：${shop.username}</p>
+                    <p>密碼：${'•'.repeat(shop.password.length)}</p>
+                    <p>ID：${shop.id}</p>
+                    <div class="btn-group">
+                        <button class="btn btn-info" onclick="editShop('${shop.id}')">編輯</button>
+                        <button class="btn btn-danger" onclick="deleteShop('${shop.id}')">刪除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addShop() {
+            const name = document.getElementById('shop-name').value.trim();
+            const username = document.getElementById('shop-username').value.trim();
+            const password = document.getElementById('shop-password').value.trim();
+
+            if (!name || !username || !password) {
+                alert('請填寫所有欄位');
+                return;
+            }
+
+            const newId = 'S' + String(shops.length + 1).padStart(4, '0');
+            shops.push({ id: newId, name, username, password });
+
+            document.getElementById('shop-name').value = '';
+            document.getElementById('shop-username').value = '';
+            document.getElementById('shop-password').value = '';
+
+            renderShops();
+            alert('店家新增成功！');
+        }
+
+        function editShop(id) {
+            const shop = shops.find(s => s.id === id);
+            if (!shop) return;
+
+            const newName = prompt('編輯店家名稱：', shop.name);
+            if (newName !== null && newName.trim()) {
+                shop.name = newName.trim();
+                renderShops();
+                alert('店家已更新！');
+            }
+        }
+
+        function deleteShop(id) {
+            if (confirm('確定要刪除此店家嗎？')) {
+                shops = shops.filter(s => s.id !== id);
+                renderShops();
+                alert('店家已刪除！');
+            }
+        }
+
+        function filterShops() {
+            const searchTerm = document.getElementById('search-shop').value.toLowerCase();
+            const shopList = document.getElementById('shop-list');
+
+            const filtered = shops.filter(shop =>
+                shop.name.toLowerCase().includes(searchTerm) ||
+                shop.id.toLowerCase().includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                shopList.innerHTML = '<div class="empty-state"><p>找不到符合的店家</p></div>';
+                return;
+            }
+
+            shopList.innerHTML = filtered.map(shop => `
+                <div class="shop-card">
+                    <h3>${shop.name}</h3>
+                    <p>帳號：${shop.username}</p>
+                    <p>密碼：${'•'.repeat(shop.password.length)}</p>
+                    <p>ID：${shop.id}</p>
+                    <div class="btn-group">
+                        <button class="btn btn-info" onclick="editShop('${shop.id}')">編輯</button>
+                        <button class="btn btn-danger" onclick="deleteShop('${shop.id}')">刪除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 防止休眠 - 定期發送心跳信號
+        function keepAlive() {
+            fetch('/api/health')
+                .catch(err => console.log('Keep-alive ping failed:', err));
+        }
+
+        // 每 5 分鐘發送一次心跳
+        setInterval(keepAlive, 5 * 60 * 1000);
+
+        // 頁面加載時初始化
+        window.addEventListener('load', () => {
+            renderShops();
+        });
+    </script>
+</body>
+</html>

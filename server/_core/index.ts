@@ -97,6 +97,12 @@ async function startServer() {
     }
   });
 
+  // Serve admin shop (no login required)
+  app.get("/admin-shop", (_req, res) => {
+    const adminShopPath = path.resolve(__dirname, "../../public/admin-shop.html");
+    res.sendFile(adminShopPath);
+  });
+
   // Serve admin panel
   app.get("/admin-panel", (_req, res) => {
     const adminPanelPath = path.resolve(__dirname, "../../public/admin-panel.html");
