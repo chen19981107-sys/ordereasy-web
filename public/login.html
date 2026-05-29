@@ -352,7 +352,7 @@
         }
 
         // 管理員登入
-        function handleAdminLogin(event) {
+        async function handleAdminLogin(event) {
             event.preventDefault();
 
             const username = document.getElementById('admin-username').value.trim();
@@ -365,26 +365,45 @@
                 return;
             }
 
-            // 模擬登入驗證
-            if (username === 'admin' && password === 'admin') {
-                // 保存登入信息
-                localStorage.setItem('adminUser', JSON.stringify({
-                    username: username,
-                    role: 'admin',
-                    loginTime: new Date().toISOString()
-                }));
+            try {
+                // 調用後端 API 進行驗證
+                const response = await fetch('/api/trpc/admin.login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        json: { username, password }
+                    })
+                });
 
-                // 記住帳號
-                if (remember) {
-                    localStorage.setItem('savedAdminUsername', username);
+                const data = await response.json();
+
+                if (response.ok && data.result && data.result.data) {
+                    // 登入成功
+                    localStorage.setItem('adminUser', JSON.stringify({
+                        username: username,
+                        role: 'admin',
+                        loginTime: new Date().toISOString()
+                    }));
+
+                    // 記住帳號
+                    if (remember) {
+                        localStorage.setItem('savedAdminUsername', username);
+                    } else {
+                        localStorage.removeItem('savedAdminUsername');
+                    }
+
+                    // 跳轉到管理員後台
+                    window.location.href = '/admin-panel';
                 } else {
-                    localStorage.removeItem('savedAdminUsername');
+                    // 登入失敗
+                    const errorMsg = data.result?.error?.message || '帳號或密碼錯誤';
+                    showError('admin-error', errorMsg);
                 }
-
-                // 跳轉到管理員後台
-                window.location.href = '/admin-panel';
-            } else {
-                showError('admin-error', '帳號或密碼錯誤');
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('admin-error', '登入失敗，請稍後重試');
             }
         }
 
