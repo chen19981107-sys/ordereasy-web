@@ -80,6 +80,28 @@ async function startServer() {
     res.sendFile(orderFormPath);
   });
 
+  // Serve admin dashboard
+  app.get("/admin", (_req, res) => {
+    const adminPath = path.resolve(__dirname, "../../public/admin.html");
+    const fs = require("fs");
+    if (fs.existsSync(adminPath)) {
+      res.sendFile(adminPath);
+    } else {
+      res.status(404).json({ error: "admin.html not found" });
+    }
+  });
+
+  // Serve admin panel
+  app.get("/admin-panel", (_req, res) => {
+    const adminPanelPath = path.resolve(__dirname, "../../public/admin-panel.html");
+    const fs = require("fs");
+    if (fs.existsSync(adminPanelPath)) {
+      res.sendFile(adminPanelPath);
+    } else {
+      res.status(404).json({ error: "admin-panel.html not found" });
+    }
+  });
+
   app.use(
     "/api/trpc",
     createExpressMiddleware({
