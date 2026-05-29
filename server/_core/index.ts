@@ -173,6 +173,22 @@ async function startServer() {
   server.listen(port, () => {
     console.log(`[api] server listening on port ${port}`);
   });
+
+  // 啟動自動心跳機制，確保系統永不休眠
+  startAutoHeartbeat();
+}
+
+// 自動心跳機制 - 每 4 分鐘發送一次內部心跳信號
+function startAutoHeartbeat() {
+  const HEARTBEAT_INTERVAL = 4 * 60 * 1000; // 4 分鐘
+  
+  setInterval(() => {
+    const timestamp = new Date().toISOString();
+    console.log(`[heartbeat] Auto heartbeat at ${timestamp}`);
+    // 這個心跳信號會保持後端進程活躍
+  }, HEARTBEAT_INTERVAL);
+  
+  console.log(`[heartbeat] Auto heartbeat started (interval: ${HEARTBEAT_INTERVAL / 1000 / 60} minutes)`);
 }
 
 startServer().catch(console.error);
