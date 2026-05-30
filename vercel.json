@@ -9,10 +9,18 @@
   "functions": {
     "dist/index.js": {
       "memory": 1024,
-      "maxDuration": 60
+      "maxDuration": 60,
+      "runtime": "nodejs20.x"
     }
   },
   "routes": [
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1",
+      "headers": {
+        "cache-control": "public, max-age=3600"
+      }
+    },
     {
       "src": "/(.*)",
       "dest": "dist/index.js"
