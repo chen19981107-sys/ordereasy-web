@@ -11,6 +11,7 @@ import { registerOrderAPI } from "./order-api";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 
+
 // Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,8 +77,13 @@ async function startServer() {
 
   // Serve login page (no auth required)
   app.get("/login", (_req, res) => {
-    const loginPath = path.resolve(__dirname, "../../public/login.html");
-    res.sendFile(loginPath);
+    try {
+      const loginPath = path.resolve(__dirname, "../../public/login.html");
+      res.sendFile(loginPath);
+    } catch (error) {
+      console.error("Error serving login page:", error);
+      res.status(500).json({ error: "Failed to load login page" });
+    }
   });
 
   // Serve order form (no auth required)
@@ -95,12 +101,12 @@ async function startServer() {
 
   // Serve admin dashboard with authentication check
   app.get("/admin", checkAdminAuth, (_req, res) => {
-    const adminPath = path.resolve(__dirname, "../../public/admin.html");
-    const fs = require("fs");
-    if (fs.existsSync(adminPath)) {
+    try {
+      const adminPath = path.resolve(__dirname, "../../public/admin.html");
       res.sendFile(adminPath);
-    } else {
-      res.status(404).json({ error: "admin.html not found" });
+    } catch (error) {
+      console.error("Error serving admin page:", error);
+      res.status(500).json({ error: "Failed to load admin page" });
     }
   });
 
@@ -112,15 +118,16 @@ async function startServer() {
 
   // Serve admin panel with authentication check
   app.get("/admin-panel", checkAdminAuth, (_req, res) => {
-    const adminPanelPath = path.resolve(__dirname, "../../public/admin-panel.html");
-    const fs = require("fs");
-    if (fs.existsSync(adminPanelPath)) {
+    try {
+      const adminPanelPath = path.resolve(__dirname, "../../public/admin-panel.html");
       res.sendFile(adminPanelPath);
-    } else {
-      res.status(404).json({ error: "admin-panel.html not found" });
+    } catch (error) {
+      console.error("Error serving admin-panel page:", error);
+      res.status(500).json({ error: "Failed to load admin-panel page" });
     }
   });
 
+  // tRPC router
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -129,46 +136,20 @@ async function startServer() {
     }),
   );
 
+  // Serve root path - redirect to admin-panel
+  app.get("/", (_req, res) => {
+    res.redirect("/admin-panel");
+  });
+
   // 404 handler for API routes (must be after tRPC middleware)
   app.use("/api", (_req, res) => {
     res.status(404).json({ error: "API endpoint not found" });
   });
 
-  // In production, serve the Expo web static output
-  // The web build is exported to the 'web-build' directory by Expo
-  const isProduction = process.env.NODE_ENV === "production";
-  if (isProduction) {
-    const webBuildDir = path.resolve(__dirname, "../../web-build");
-    const fs = await import("fs");
-    if (fs.existsSync(webBuildDir)) {
-      // Serve Expo static web build
-      app.use(express.static(webBuildDir));
-      // SPA fallback: serve index.html for all non-API routes
-      app.get("*", (req, res) => {
-        // Don't serve HTML for /order (handled above) or /api routes
-        if (req.path.startsWith("/api") || req.path === "/order") {
-          res.status(404).json({ error: "Not found" });
-          return;
-        }
-        const indexPath = path.resolve(webBuildDir, "index.html");
-        if (fs.existsSync(indexPath)) {
-          res.sendFile(indexPath);
-        } else {
-          res.status(404).json({ error: "Web build not found" });
-        }
-      });
-    } else {
-      // Fallback if web-build doesn't exist
-      app.get("/", (_req, res) => {
-        res.json({ ok: true, service: "OrderEasy API Server" });
-      });
-    }
-  } else {
-    // Development: just return health check at root
-    app.get("/", (_req, res) => {
-      res.json({ ok: true, service: "OrderEasy API Server" });
-    });
-  }
+  // Catch-all 404 handler
+  app.use((_req, res) => {
+    res.status(404).json({ error: "Not found" });
+  });
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
