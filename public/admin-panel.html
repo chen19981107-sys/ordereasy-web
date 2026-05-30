@@ -285,6 +285,68 @@
             color: #999;
         }
 
+        /* 模態框樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-footer button {
+            flex: 1;
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -334,15 +396,15 @@
                 <form onsubmit="handleAddShop(event)">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>店家名稱</label>
+                            <label>店家名稱 *</label>
                             <input type="text" id="shop-name" placeholder="例：東門店" required>
                         </div>
                         <div class="form-group">
-                            <label>帳號</label>
+                            <label>店家帳號 *</label>
                             <input type="text" id="shop-username" placeholder="例：shop001" required>
                         </div>
                         <div class="form-group">
-                            <label>密碼</label>
+                            <label>密碼 *</label>
                             <input type="password" id="shop-password" placeholder="輸入密碼" required>
                         </div>
                     </div>
@@ -377,6 +439,34 @@
         </div>
     </div>
 
+    <!-- 編輯店家模態框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>編輯店家資訊</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form onsubmit="handleSaveShop(event)">
+                <div class="form-group">
+                    <label>店家名稱 *</label>
+                    <input type="text" id="edit-shop-name" required>
+                </div>
+                <div class="form-group">
+                    <label>店家帳號 *</label>
+                    <input type="text" id="edit-shop-username" disabled>
+                </div>
+                <div class="form-group">
+                    <label>新密碼 (留空不改)</label>
+                    <input type="password" id="edit-shop-password" placeholder="不填表示不改密碼">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="closeEditModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存變更</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // 初始化
         function init() {
@@ -385,6 +475,21 @@
             if (!adminUser) {
                 window.location.href = '/login';
                 return;
+            }
+
+            // 初始化測試數據（如果 localStorage 中沒有店家數據）
+            const existingShops = localStorage.getItem('shops');
+            if (!existingShops || JSON.parse(existingShops).length === 0) {
+                const testShops = [
+                    {
+                        id: 'S0001',
+                        name: '測試店家',
+                        username: '123',
+                        password: '123',
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                localStorage.setItem('shops', JSON.stringify(testShops));
             }
 
             // 載入店家列表
@@ -465,7 +570,7 @@
                 <div class="shop-item">
                     <h3>${shop.name}</h3>
                     <p>帳號：${shop.username}</p>
-                    <p>密碼：${'•'.repeat(shop.password.length)}</p>
+                    <p>密碼：${shop.password}</p>
                     <p class="shop-id">ID：${shop.id}</p>
                     <div class="shop-actions">
                         <button class="btn-edit" onclick="editShop('${shop.id}')">編輯</button>
@@ -476,8 +581,64 @@
         }
 
         // 編輯店家
+        let currentEditingShopId = null;
         function editShop(shopId) {
-            alert('編輯功能開發中...');
+            const shops = JSON.parse(localStorage.getItem('shops') || '[]');
+            const shop = shops.find(s => s.id === shopId);
+            
+            if (!shop) {
+                alert('店家不存在');
+                return;
+            }
+            
+            currentEditingShopId = shopId;
+            document.getElementById('edit-shop-name').value = shop.name;
+            document.getElementById('edit-shop-username').value = shop.username;
+            document.getElementById('edit-shop-password').value = '';
+            
+            document.getElementById('editModal').classList.add('active');
+        }
+        
+        // 關閉編輯模態框
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentEditingShopId = null;
+        }
+        
+        // 保存店家變更
+        function handleSaveShop(event) {
+            event.preventDefault();
+            
+            if (!currentEditingShopId) {
+                alert('錯誤：未選擇店家');
+                return;
+            }
+            
+            const newName = document.getElementById('edit-shop-name').value.trim();
+            const newPassword = document.getElementById('edit-shop-password').value.trim();
+            
+            if (!newName) {
+                alert('店家名稱不能為空');
+                return;
+            }
+            
+            let shops = JSON.parse(localStorage.getItem('shops') || '[]');
+            const shopIndex = shops.findIndex(s => s.id === currentEditingShopId);
+            
+            if (shopIndex === -1) {
+                alert('店家不存在');
+                return;
+            }
+            
+            shops[shopIndex].name = newName;
+            if (newPassword) {
+                shops[shopIndex].password = newPassword;
+            }
+            
+            localStorage.setItem('shops', JSON.stringify(shops));
+            closeEditModal();
+            loadShops();
+            alert('店家資訊已更新！');
         }
 
         // 刪除店家
@@ -513,7 +674,7 @@
                 <div class="shop-item">
                     <h3>${shop.name}</h3>
                     <p>帳號：${shop.username}</p>
-                    <p>密碼：${'•'.repeat(shop.password.length)}</p>
+                    <p>密碼：${shop.password}</p>
                     <p class="shop-id">ID：${shop.id}</p>
                     <div class="shop-actions">
                         <button class="btn-edit" onclick="editShop('${shop.id}')">編輯</button>

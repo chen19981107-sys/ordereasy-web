@@ -328,11 +328,16 @@
                 return;
             }
 
-            // 模擬登入驗證
-            if (username === 'shop1' && password === '1234') {
+                // 從 localStorage 中查找店家
+            const shops = JSON.parse(localStorage.getItem('shops') || '[]');
+            const shop = shops.find(s => s.username === username && s.password === password);
+
+            if (shop) {
                 // 保存登入信息
                 localStorage.setItem('shopUser', JSON.stringify({
-                    username: username,
+                    username: shop.username,
+                    shopId: shop.id,
+                    shopName: shop.name,
                     role: 'shop',
                     loginTime: new Date().toISOString()
                 }));
