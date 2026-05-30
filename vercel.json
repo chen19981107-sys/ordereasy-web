@@ -6,13 +6,7 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "functions": {
-    "dist/index.js": {
-      "memory": 1024,
-      "maxDuration": 60,
-      "runtime": "nodejs@20"
-    }
-  },
+
   "routes": [
     {
       "src": "/(.*)",
