@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build",
+  "buildCommand": "node build.js",
   "outputDirectory": "dist",
   "installCommand": "pnpm install",
   "env": {
