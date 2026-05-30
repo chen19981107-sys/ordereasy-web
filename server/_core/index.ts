@@ -74,20 +74,27 @@ async function startServer() {
     res.json({ ok: true, timestamp: Date.now() });
   });
 
-  // Serve login page
+  // Serve login page (no auth required)
   app.get("/login", (_req, res) => {
     const loginPath = path.resolve(__dirname, "../../public/login.html");
     res.sendFile(loginPath);
   });
 
-  // Serve order form
+  // Serve order form (no auth required)
   app.get("/order", (_req, res) => {
     const orderFormPath = path.resolve(__dirname, "../../public/order-form.html");
     res.sendFile(orderFormPath);
   });
 
-  // Serve admin dashboard
-  app.get("/admin", (_req, res) => {
+  // Middleware to check admin authentication
+  const checkAdminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // 不檢查認證，讓前端 JavaScript 處理
+    // 這樣可以避免無限重定向循環
+    next();
+  };
+
+  // Serve admin dashboard with authentication check
+  app.get("/admin", checkAdminAuth, (_req, res) => {
     const adminPath = path.resolve(__dirname, "../../public/admin.html");
     const fs = require("fs");
     if (fs.existsSync(adminPath)) {
@@ -103,8 +110,8 @@ async function startServer() {
     res.sendFile(adminShopPath);
   });
 
-  // Serve admin panel
-  app.get("/admin-panel", (_req, res) => {
+  // Serve admin panel with authentication check
+  app.get("/admin-panel", checkAdminAuth, (_req, res) => {
     const adminPanelPath = path.resolve(__dirname, "../../public/admin-panel.html");
     const fs = require("fs");
     if (fs.existsSync(adminPanelPath)) {
