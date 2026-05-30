@@ -10,7 +10,7 @@
     "dist/index.js": {
       "memory": 1024,
       "maxDuration": 60,
-      "runtime": "nodejs20"
+      "runtime": "nodejs@20"
     }
   },
   "routes": [
