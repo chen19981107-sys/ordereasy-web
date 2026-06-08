@@ -5,5 +5,23 @@
   "installCommand": "pnpm install",
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "routes": [
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/(login|admin|admin-panel|admin-shop|order-form)",
+      "dest": "/public/$1.html"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.js"
+    }
+  ]
 }
