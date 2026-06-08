@@ -344,7 +344,7 @@ const MENU = [
 ];
 
 const urlParams = new URLSearchParams(window.location.search);
-const STORE_ID = urlParams.get("storeId") || "1";
+const STORE_ID = urlParams.get("storeId") || urlParams.get("shop") || "1";
 const API_BASE = window.location.origin;
 const qty = {};
 MENU.forEach(m => qty[m.id] = 0);
