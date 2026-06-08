@@ -6,18 +6,27 @@
   "env": {
     "NODE_ENV": "production"
   },
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "routes": [
     {
-      "src": "/public/(.*)",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/(login|admin|admin-panel|admin-shop|order-form)",
-      "dest": "/public/$1.html"
+      "src": "/api/trpc/(.*)",
+      "dest": "/index.js"
     },
     {
       "src": "/api/(.*)",
       "dest": "/index.js"
+    },
+    {
+      "src": "/(login|admin|admin-panel|admin-shop|order-form)/?$",
+      "dest": "/public/$1.html"
+    },
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
     },
     {
       "src": "/(.*)",
